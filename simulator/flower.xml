@@ -18,7 +18,10 @@
 
 	<require path="PinsSimulators" id="PinsSimulators"/>
 
-	<function id="wet_configure" params="configuration"><![CDATA[
+	<function id="configure" params="configuration"><![CDATA[
+	
+	
+	
 		this.pinsSimulator = shell.delegate("addSimulatorPart", {
 			header : { 
 				label : "Temperature", 
@@ -33,6 +36,16 @@
 						defaultControl : PinsSimulators.SLIDER,
 					}
 				),
+				new PinsSimulators.AnalogInputAxisDescription(
+					{
+						valueLabel : "Celsius",
+						valueID : "temperatureValue",
+						defaultControl : PinsSimulators.SLIDER,
+						minValue : -30,
+						maxValue : 100,
+						value : 0
+					}
+				),
 			]
 		});
 	]]></function>
@@ -41,14 +54,20 @@
 		shell.delegate("removeSimulatorPart", this.pinsSimulator);
 	]]></function>
 
-	<function id="read"><![CDATA[
+	<function id="wetread"><![CDATA[
 		var axes = this.pinsSimulator.delegate("getValue");
 		return axes.analogValue;				
+	]]></function>
+	
+	<function id="tempread"><![CDATA[
+		var axes = this.pinsSimulator.delegate("getValue");
+		return axes.temperatureValue;				
 	]]></function>
 
 	<script><![CDATA[
 		exports.pins = {
-			wetSensor: { type: "A2D" }
+			wetSensor: { type: "A2D" },
+			temperature: {type: "I2C", address: 0x48}
 		};
 	]]></script>
 

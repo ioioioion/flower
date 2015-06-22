@@ -250,15 +250,17 @@
 </container>
     
     <script><![CDATA[
-    application.invoke( new MessageWithObject( "pins:wet_configure", {
+    application.invoke( new MessageWithObject( "pins:configure", {
         	analogSensor: {
                 require: "flower",
                 pins: {
-                    wetSensor: { pin: 52 }
+                    wetSensor: { pin: 52 },
+                    temperature: { sda: 27, clock: 29 }
+                    
                 }
             }
         } ) );
-    application.invoke( new MessageWithObject( "pins:/analogSensor/read?" + 
+    application.invoke( new MessageWithObject( "pins:/analogSensor/wetread?" + 
             serializeQuery( {       
 				repeat: "on",
 				interval: 20,

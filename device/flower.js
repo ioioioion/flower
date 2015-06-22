@@ -17,17 +17,39 @@
 
 exports.pins = {
 	wetSensor: { type: "A2D" },
-  temperature: {type: "I2C", address: 0x48}
+	temperature: {type: "I2C", address: 0x48}
 };
 
-exports.wet_configure = function() {
+exports.configure = function() {
     this.wetSensor.init();
+     if ( "temperature" in this ) {
+    this.temperature.init();
+    this.previous = -1;
+    }
 }
 
-exports.wet_read = function() {
+exports.wetread = function() {
     return this.wetSensor.read();
 }
 
-exports.wet_close = function() {
+exports.tempread = function () {
+    var data = this.temperature.readWordDataSMB(0);
+	var value = ((data & 0xFF) << 4) | ((data >> 8) >> 4);
+	if (value & 0x800) {
+	    value -= 1;
+	    value = ~value & 0xFFF;
+        value = -value;
+    }
+
+    value *= 0.0625;
+    if (value == this.previous)
+        return;
+
+    this.previous = value;
+    return value;
+}
+
+exports.close = function() {
 	this.wetSensor.close();
+	this.temperature.close();
 }
