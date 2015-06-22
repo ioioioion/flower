@@ -17,13 +17,13 @@
 
 exports.pins = {
 	wetSensor: { type: "A2D" },
-	temperature: {type: "I2C", address: 0x48}
+	i2cSensors: {type: "I2C", address: 0x48}
 };
 
 exports.configure = function() {
     this.wetSensor.init();
-     if ( "temperature" in this ) {
-    this.temperature.init();
+     if ( "i2cSensors" in this ) {
+    this.i2cSensors.init();
     this.previous = -1;
     }
 }
@@ -33,11 +33,11 @@ exports.wetread = function() {
 }
 
 exports.lightread = function() {
-    return this.wetSensor.read();
+    return this.i2cSensors.read();
 }
 
 exports.tempread = function () {
-    var data = this.temperature.readWordDataSMB(0);
+    var data = this.i2cSensors.readWordDataSMB(0);
 	var value = ((data & 0xFF) << 4) | ((data >> 8) >> 4);
 	if (value & 0x800) {
 	    value -= 1;
@@ -55,5 +55,5 @@ exports.tempread = function () {
 
 exports.close = function() {
 	this.wetSensor.close();
-	this.temperature.close();
+	this.i2cSensors.close();
 }

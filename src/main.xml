@@ -40,12 +40,30 @@
     
     
     
-    <handler path="/gotAnalogResult">
+    <handler path="/gotWetResult">
     	<behavior>
     		<method id="onInvoke" params="handler, message"><![CDATA[
                 //Receives result and passes to main container.
                 var result = message.requestObject;  
         		application.distribute( "wetChanged", result ); 		
+            ]]></method>
+        </behavior>
+    </handler>
+    <handler path="/gotTempResult">
+    	<behavior>
+    		<method id="onInvoke" params="handler, message"><![CDATA[
+                //Receives result and passes to main container.
+                var result = message.requestObject;  
+        		application.distribute( "tempChanged", result ); 		
+            ]]></method>
+        </behavior>
+    </handler>
+    <handler path="/gotLxResult">
+    	<behavior>
+    		<method id="onInvoke" params="handler, message"><![CDATA[
+                //Receives result and passes to main container.
+                var result = message.requestObject;  
+        		application.distribute( "lxChanged", result ); 		
             ]]></method>
         </behavior>
     </handler>
@@ -84,6 +102,9 @@
         <method id="onTap" params="label">
              trace(label.string);
         </method>
+        <method id="tempChanged" params="content,result"><![CDATA[
+                    content.string = result.toFixed(2) + " °C";
+     ]]></method>
     </behavior>
     
     <behavior id="ButtonBehavior_wet">
@@ -160,6 +181,9 @@
         <method id="onTap" params="label">
              trace(label.string);
         </method>
+        <method id="lxChanged" params="content,result"><![CDATA[
+                    content.string = result.toFixed(2) + " lx";
+     ]]></method>
     </behavior>
     
     <behavior id="ButtonBehavior_water">
@@ -255,8 +279,7 @@
                 require: "flower",
                 pins: {
                     wetSensor: { pin: 52 },
-                    temperature: { sda: 27, clock: 29 }
-                    
+                    i2cSensors: { sda: 27, clock: 29 }               
                 }
             }
         } ) );
@@ -264,8 +287,20 @@
             serializeQuery( {       
 				repeat: "on",
 				interval: 20,
-				callback: "/gotAnalogResult"
+				callback: "/gotWetResult"
         } ) ) );	
+    application.invoke( new MessageWithObject( "pins:/analogSensor/tempread?" + 
+            serializeQuery( {       
+				repeat: "on",
+				interval: 20,
+				callback: "/gotTempResult"
+        } ) ) );
+    application.invoke( new MessageWithObject( "pins:/analogSensor/lightread?" + 
+            serializeQuery( {       
+				repeat: "on",
+				interval: 20,
+				callback: "/gotLxResult"
+        } ) ) );
     
     application.behavior = new MODEL.ApplicationBehavior( application );
     

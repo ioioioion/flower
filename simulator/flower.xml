@@ -31,19 +31,19 @@
 			axes : [
 				new PinsSimulators.AnalogInputAxisDescription(
 					{
-						valueLabel : "Value",
-						valueID : "analogValue",
-						defaultControl : PinsSimulators.SLIDER,
-					}
-				),
-				new PinsSimulators.AnalogInputAxisDescription(
-					{
 						valueLabel : "Celsius",
 						valueID : "temperatureValue",
 						defaultControl : PinsSimulators.SLIDER,
 						minValue : -30,
 						maxValue : 100,
 						value : 0
+					}
+				),
+				new PinsSimulators.AnalogInputAxisDescription(
+					{
+						valueLabel : "Input Voltage",
+						valueID : "analogValue",
+						defaultControl : PinsSimulators.SLIDER,
 					}
 				),
 				new PinsSimulators.AnalogInputAxisDescription(
@@ -82,7 +82,7 @@
 	<script><![CDATA[
 		exports.pins = {
 			wetSensor: { type: "A2D" },
-			temperature: {type: "I2C", address: 0x48}
+			i2cSensors: {type: "I2C", address: 0x48}
 		};
 	]]></script>
 
