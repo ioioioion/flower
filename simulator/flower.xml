@@ -46,6 +46,16 @@
 						value : 0
 					}
 				),
+				new PinsSimulators.AnalogInputAxisDescription(
+					{
+						valueLabel : "lx",
+						valueID : "LuminosityValue",
+						defaultControl : PinsSimulators.SLIDER,
+						minValue : -30,
+						maxValue : 100,
+						value : 0
+					}
+				),
 			]
 		});
 	]]></function>
@@ -62,6 +72,11 @@
 	<function id="tempread"><![CDATA[
 		var axes = this.pinsSimulator.delegate("getValue");
 		return axes.temperatureValue;				
+	]]></function>
+	
+		<function id="lightread"><![CDATA[
+		var axes = this.pinsSimulator.delegate("getValue");
+		return axes.LuminosityValue;				
 	]]></function>
 
 	<script><![CDATA[

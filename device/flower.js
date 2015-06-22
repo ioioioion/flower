@@ -32,6 +32,10 @@ exports.wetread = function() {
     return this.wetSensor.read();
 }
 
+exports.lightread = function() {
+    return this.wetSensor.read();
+}
+
 exports.tempread = function () {
     var data = this.temperature.readWordDataSMB(0);
 	var value = ((data & 0xFF) << 4) | ((data >> 8) >> 4);
