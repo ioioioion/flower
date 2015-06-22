@@ -48,7 +48,7 @@
 
 	<script><![CDATA[
 		exports.pins = {
-			analogTemp: { type: "A2D" }
+			wetSensor: { type: "A2D" }
 		};
 	]]></script>
 

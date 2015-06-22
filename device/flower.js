@@ -16,17 +16,17 @@
 */
 
 exports.pins = {
-	analogTemp: { type: "A2D" }
+	wetSensor: { type: "A2D" }
 };
 
 exports.configure = function() {
-    this.analogTemp.init();
+    this.wetSensor.init();
 }
 
 exports.read = function() {
-    return this.analogTemp.read();
+    return this.wetSensor.read();
 }
 
 exports.close = function() {
-	this.analogTemp.close();
+	this.wetSensor.close();
 }

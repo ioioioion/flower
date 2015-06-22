@@ -238,7 +238,7 @@
         	analogSensor: {
                 require: "flower",
                 pins: {
-                    analogTemp: { pin: 52 }
+                    wetSensor: { pin: 52 }
                 }
             }
         } ) );
