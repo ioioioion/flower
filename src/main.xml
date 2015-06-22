@@ -234,7 +234,7 @@
 </container>
     
     <script><![CDATA[
-    application.invoke( new MessageWithObject( "pins:configure", {
+    application.invoke( new MessageWithObject( "pins:wet_configure", {
         	analogSensor: {
                 require: "flower",
                 pins: {
