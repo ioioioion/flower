@@ -38,6 +38,17 @@
     <style id="biglabelStyle" font="bold 24px" color="white" align="center,middle"/>
     <style id="numStyle" font="bold 26px" color="white" align="center,top"/>
     
+    
+    
+    <handler path="/gotAnalogResult">
+    	<behavior>
+    		<method id="onInvoke" params="handler, message"><![CDATA[
+                //Receives result and passes to main container.
+                var result = message.requestObject;  
+        		application.distribute( "wetChanged", result ); 		
+            ]]></method>
+        </behavior>
+    </handler>
     <!-- MODEL -->
 
     <behavior id="ButtonBehavior_temp">
@@ -108,6 +119,11 @@
         <method id="onTap" params="label">
              trace(label.string);
         </method>
+        <method id="wetChanged" params="content,result"><![CDATA[
+            		//Converts voltage result to temperature. 
+                    var temp = 100 * ( result * 2.8 ) - 50;
+                    content.string = temp.toFixed(2) + " %";
+     ]]></method>
     </behavior>
     
     <behavior id="ButtonBehavior_light">
@@ -128,7 +144,7 @@
         </method>
     </behavior>
     
-        <behavior id="ButtonBehavior_light_num">
+    <behavior id="ButtonBehavior_light_num">
         <method id="onCreate" params="label">
             label.coordinates = {top:0, bottom:1, left:1, right:1};
             label.skin = button_light_Skin;
@@ -242,7 +258,12 @@
                 }
             }
         } ) );
-    	
+    application.invoke( new MessageWithObject( "pins:/analogSensor/read?" + 
+            serializeQuery( {       
+				repeat: "on",
+				interval: 20,
+				callback: "/gotAnalogResult"
+        } ) ) );	
     
     application.behavior = new MODEL.ApplicationBehavior( application );
     
