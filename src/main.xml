@@ -279,7 +279,9 @@
                 require: "flower",
                 pins: {
                     wetSensor: { pin: 52 },
-                    i2cSensors: { sda: 27, clock: 29 }               
+                    i2cSensors: { sda: 27, clock: 29 },  
+                    watering:  { pin: 62 },
+                    led: { pin: 59 }            
                 }
             }
         } ) );

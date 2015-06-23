@@ -17,7 +17,10 @@
 
 exports.pins = {
 	wetSensor: { type: "A2D" },
-	i2cSensors: {type: "I2C", address: 0x48}
+	i2cSensors: {type: "I2C", address: 0x48},
+    watering: {type: "Digital", direction: "output"},
+    led: {type: "Digital", direction: "output"},
+    
 };
 
 exports.configure = function() {
@@ -26,6 +29,8 @@ exports.configure = function() {
     this.i2cSensors.init();
     this.previous = -1;
     }
+     this.led.init();
+     this.watering.init();
 }
 
 exports.wetread = function() {
@@ -56,4 +61,6 @@ exports.tempread = function () {
 exports.close = function() {
 	this.wetSensor.close();
 	this.i2cSensors.close();
+    this.led.close();
+    this.watering.close();
 }

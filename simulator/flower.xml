@@ -24,8 +24,8 @@
 	
 		this.pinsSimulator = shell.delegate("addSimulatorPart", {
 			header : { 
-				label : "Temperature", 
-				name : "Analog Input", 
+				label : "Interfaces", 
+				name : "Input&Output", 
 				iconVariant : PinsSimulators.SENSOR_KNOB 
 			},
 			axes : [
@@ -42,7 +42,7 @@
 				new PinsSimulators.AnalogInputAxisDescription(
 					{
 						valueLabel : "Input Voltage",
-						valueID : "analogValue",
+						valueID : "wetValue",
 						defaultControl : PinsSimulators.SLIDER,
 					}
 				),
@@ -56,6 +56,18 @@
 						value : 0
 					}
 				),
+				new PinsSimulators.DigitalOutputAxisDescription(
+					{
+						valueLabel : "Watering",
+						valueID : "wateringValue"
+					}
+				),
+				new PinsSimulators.DigitalOutputAxisDescription(
+					{
+						valueLabel : "LED",
+						valueID : "ledValue"
+					}
+				),
 			]
 		});
 	]]></function>
@@ -66,7 +78,7 @@
 
 	<function id="wetread"><![CDATA[
 		var axes = this.pinsSimulator.delegate("getValue");
-		return axes.analogValue;				
+		return axes.wetValue;				
 	]]></function>
 	
 	<function id="tempread"><![CDATA[
@@ -74,7 +86,7 @@
 		return axes.temperatureValue;				
 	]]></function>
 	
-		<function id="lightread"><![CDATA[
+	<function id="lightread"><![CDATA[
 		var axes = this.pinsSimulator.delegate("getValue");
 		return axes.LuminosityValue;				
 	]]></function>
@@ -82,7 +94,9 @@
 	<script><![CDATA[
 		exports.pins = {
 			wetSensor: { type: "A2D" },
-			i2cSensors: {type: "I2C", address: 0x48}
+			i2cSensors: {type: "I2C", address: 0x48},
+			watering: {type: "Digital", direction: "output"},
+			led: { type: "Digital", direction: "output" }
 		};
 	]]></script>
 
