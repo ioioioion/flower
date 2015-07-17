@@ -303,6 +303,7 @@
 				interval: 20,
 				callback: "/gotLxResult"
         } ) ) );
+    application.shared = true;
     
     application.behavior = new MODEL.ApplicationBehavior( application );
     
