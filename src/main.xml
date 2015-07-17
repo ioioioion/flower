@@ -264,7 +264,7 @@
                     <method id="onTap" params="label">label.invoke(new Message("/Watering"));</method>
                 </behavior>
             </label>
-            <label string="'Led'">
+            <label string="'LED'">
                 <behavior like="ButtonBehavior_led">
                     <method id="onTap" params="label">label.invoke(new Message("/led"));</method>
                 </behavior>
