@@ -38,7 +38,18 @@
     <style id="biglabelStyle" font="bold 24px" color="white" align="center,middle"/>
     <style id="numStyle" font="bold 26px" color="white" align="center,top"/>
     
-    
+    <handler path="/getSAE">
+    	<behavior>
+    		<method id="onInvoke" params="handler, message"><![CDATA[
+                //Receives result and passes to main container.
+    			handler.invoke(new Message("http://xijincheng.sinaapp.com/?11111"), Message.TEXT);
+            ]]></method>
+            <method id="onComplete" params="handler, message, text"><![CDATA[
+                //Receives result and passes to main container.
+                trace(text);
+            ]]></method>
+        </behavior>
+    </handler>
     
     <handler path="/gotWetResult">
     	<behavior>
@@ -304,6 +315,7 @@
 				callback: "/gotLxResult"
         } ) ) );
     application.shared = true;
+    application.invoke( new Message("/getSAE"));
     
     application.behavior = new MODEL.ApplicationBehavior( application );
     
