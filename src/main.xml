@@ -153,7 +153,7 @@
         </method>
         <method id="wetChanged" params="content,result"><![CDATA[
             		//Converts voltage result to temperature. 
-                    var temp = 100 * ( result * 2.8 ) - 50;
+                    var temp = result;
                     content.string = temp.toFixed(2) + " %";
      ]]></method>
     </behavior>
@@ -289,10 +289,10 @@
         	analogSensor: {
                 require: "flower",
                 pins: {
-                    wetSensor: { pin: 65 },
-                    i2cTemp: { sda: 54, clock: 55 },  
-                    i2cLumin: { sda: 54, clock: 55 },  
-                    watering:  { pin: 63 },
+                    wetSensor: { pin: 58 },
+                    i2cTemp: { sda: 55, clock: 56 },  
+                    i2cLumin: { sda: 60, clock: 61 },  
+                    watering:  { pin: 66 },
                     led: { pin: 64 }            
                 }
             }
@@ -300,19 +300,19 @@
     application.invoke( new MessageWithObject( "pins:/analogSensor/wetread?" + 
             serializeQuery( {       
 				repeat: "on",
-				interval: 20,
+				interval: 1000,
 				callback: "/gotWetResult"
         } ) ) );	
     application.invoke( new MessageWithObject( "pins:/analogSensor/tempread?" + 
             serializeQuery( {       
 				repeat: "on",
-				interval: 20,
+				interval: 1000,
 				callback: "/gotTempResult"
         } ) ) );
     application.invoke( new MessageWithObject( "pins:/analogSensor/lightread?" + 
             serializeQuery( {       
 				repeat: "on",
-				interval: 20,
+				interval: 1000,
 				callback: "/gotLxResult"
         } ) ) );
     application.behavior = new MODEL.ApplicationBehavior( application );

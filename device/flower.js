@@ -34,24 +34,24 @@ exports.configure = function () {
 }
 
 exports.wetread = function() {
-    return 100;
+    return (1-this.wetSensor.read())*100;
 }
 
 exports.lightread = function() {
-    var data = this.i2cLumin.readWordDataSMB(0xAC);
-	var value = ((data) >> 5) & 0x3ff ;
-	if (value & 0x200) {
-	    value -= 1;
-	    value = ~value & 0x3FF;
-        value = -value;
+    var light_data_ch0 = this.i2cLumin.readWordDataSMB(0xAC);
+    var light_data_ch1 = this.i2cLumin.readWordDataSMB(0xAE);
+    var div =  light_data_ch1/light_data_ch0;
+    var lumi = 0;
+    if (div < 0.5){
+         lumi = light_data_ch0*0.0304-0.062*light_data_ch0*Math.pow(div,1.4);
+    }else if(div<0.61){
+         lumi = light_data_ch0*0.0224-0.031*light_data_ch1;
+    }else if(div<0.8){
+         lumi = light_data_ch0*0.0128-0.0153*light_data_ch1;
+    }else if(div<1.3){
+         lumi = light_data_ch0*0.00146-0.00112*light_data_ch1;
     }
-
-    value *= 0.125;
-    if (value == this.previous_l)
-        return;
-
-    this.previous_l = value;
-    return data;
+    return lumi*16;
 }
 
 exports.tempread = function () {
@@ -65,10 +65,6 @@ exports.tempread = function () {
     }
 
     value *= 0.125;
-    if (value == this.previous_t)
-        return;
-
-    this.previous_t = value;
     return value;
 }
 
