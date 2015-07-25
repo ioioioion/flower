@@ -42,8 +42,14 @@
     	<behavior>
     		<method id="onInvoke" params="handler, message"><![CDATA[
                 //Receives result and passes to main container.
-    			handler.invoke(new Message("http://xijincheng.sinaapp.com/?11111"), Message.TEXT);
-            ]]></method>
+                var posturl = "https://api.weibo.com/2/statuses/update.json";
+				var message = new Message(posturl);
+				message.method = "POST";
+				message.requestText = encodeURI("status=发微博&access_token=2.00JJK4KBTeaqdCa032603feeRqzg8D");
+				message.setRequestHeader("Content-Length", message.requestText.length);
+				message.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+				handler.invoke(message, Message.TEXT);           
+			]]></method>
             <method id="onComplete" params="handler, message, text"><![CDATA[
                 //Receives result and passes to main container.
                 trace(text);
@@ -315,8 +321,9 @@
 				interval: 1000,
 				callback: "/gotLxResult"
         } ) ) );
+    application.invoke(new Message("/getSAE"));
     application.behavior = new MODEL.ApplicationBehavior( application );
-    
+
     var data = {
         title: 'dialog maniacs',
     };
