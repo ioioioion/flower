@@ -289,10 +289,11 @@
         	analogSensor: {
                 require: "flower",
                 pins: {
-                    wetSensor: { pin: 52 },
-                    i2cSensors: { sda: 27, clock: 29 },  
-                    watering:  { pin: 62 },
-                    led: { pin: 59 }            
+                    wetSensor: { pin: 65 },
+                    i2cTemp: { sda: 54, clock: 55 },  
+                    i2cLumin: { sda: 54, clock: 55 },  
+                    watering:  { pin: 63 },
+                    led: { pin: 64 }            
                 }
             }
         } ) );
@@ -314,9 +315,6 @@
 				interval: 20,
 				callback: "/gotLxResult"
         } ) ) );
-    application.shared = true;
-    application.invoke( new Message("/getSAE"));
-    
     application.behavior = new MODEL.ApplicationBehavior( application );
     
     var data = {

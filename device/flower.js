@@ -30,36 +30,50 @@ exports.configure = function () {
     this.i2cLumin.init();
     this.led.init();
     this.watering.init();
+    this.i2cLumin.writeByteDataSMB(0x80,0x03);
 }
 
 exports.wetread = function() {
-    return this.wetSensor.read();
+    return 100;
 }
 
 exports.lightread = function() {
-    return this.i2cLumin.read();
+    var data = this.i2cLumin.readWordDataSMB(0xAC);
+	var value = ((data) >> 5) & 0x3ff ;
+	if (value & 0x200) {
+	    value -= 1;
+	    value = ~value & 0x3FF;
+        value = -value;
+    }
+
+    value *= 0.125;
+    if (value == this.previous_l)
+        return;
+
+    this.previous_l = value;
+    return data;
 }
 
 exports.tempread = function () {
     var data = this.i2cTemp.readWordDataSMB(0);
-	var value = ((data & 0xFF) << 4) | ((data >> 8) >> 4);
-	if (value & 0x800) {
+    data = ( data >> 8 ) & 0xff | ( data << 8 ) & 0xff00;
+	var value = ((data) >> 5) & 0x3ff ;
+	if (value & 0x200) {
 	    value -= 1;
-	    value = ~value & 0xFFF;
+	    value = ~value & 0x3FF;
         value = -value;
     }
 
-    value *= 0.0625;
-    if (value == this.previous)
+    value *= 0.125;
+    if (value == this.previous_t)
         return;
 
-    this.previous = value;
+    this.previous_t = value;
     return value;
 }
 
 exports.close = function() {
 	this.wetSensor.close();
-	this.i2cSensors.close();
     this.i2cTemp.close();
     this.i2cLumin.close();
     this.watering.close();

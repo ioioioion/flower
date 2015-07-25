@@ -94,7 +94,8 @@
 	<script><![CDATA[
 		exports.pins = {
 			wetSensor: { type: "A2D" },
-			i2cSensors: {type: "I2C", address: 0x48},
+			i2cTemp: {type: "I2C", address: 0x48}, 
+			i2cLumin: {type: "I2C", address: 0x29},
 			watering: {type: "Digital", direction: "output"},
 			led: { type: "Digital", direction: "output" }
 		};
