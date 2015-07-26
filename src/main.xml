@@ -68,7 +68,7 @@
     		<method id="onInvoke" params="handler, message"><![CDATA[
                 //Receives result and passes to main container.
                 var result = message.requestObject;  
-        		application.distribute( "wetChanged", result ); 		
+        		application.distribute( "wetChanged", result );            		
             ]]></method>
         </behavior>
     </handler>
@@ -86,7 +86,13 @@
     		<method id="onInvoke" params="handler, message"><![CDATA[
                 //Receives result and passes to main container.
                 var result = message.requestObject;  
-        		application.distribute( "lxChanged", result ); 		
+        		application.distribute( "lxChanged", result ); 	
+                if(result<lumi_exp&&!led_sts&&!led_manual)
+                {
+                    application.distribute( "LedOn"); 
+                } else if (result>lumi_exp+100&&!led_manual){
+                    application.distribute( "LedOff"); 
+                }
             ]]></method>
         </behavior>
     </handler>
@@ -247,7 +253,6 @@
         </method>
         <method id="onTouchEnded" params="label">
             label.skin = button_led_Skin;
-            led_sts = 1 - led_sts;
             led_manual = 1 - led_manual;
             if(led_sts == 1)
                 this.LedOn(label);
@@ -256,9 +261,11 @@
         </method>
         <method id="LedOn" params="label">
             label.string ="LED:ON";
+            led_sts = 1;
         </method>
         <method id="LedOff" params="label">
             label.string ="LED:OFF";
+            led_sts = 1;
         </method>
     </behavior>
 
