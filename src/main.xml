@@ -19,8 +19,10 @@
     <require path="mobile/model" id="MODEL"/>
     <require path="themes/sample/theme" id="THEME"/>
     <require path="mobile/keyboard" id="KEYBOARD"/>
-    <variable id="exp_wet" value="0"/>
-   	<variable id="exp_light" value="0"/>
+    <variable id="humi_exp" value="0"/>
+    <variable id="temp_min" value="0"/>
+    <variable id="temp_max" value="0"/>
+   	<variable id="lumi_exp" value="0"/>
     <!-- ASSETS -->
 
     <skin id="backgroundSkin" color="#000000"/>
@@ -247,49 +249,55 @@
             <column top="0" left="0" bottom="0" right="0">
                 <label string="'Temperature'">
                     <behavior like="ButtonBehavior_temp">
+                        <method id="onTap" params="label">label.invoke(new Message("/temp_setting"));</method>
                     </behavior>
                 </label>
                 <label string="'50 °C'">
                     <behavior like="ButtonBehavior_temp_num">
+                        <method id="onTap" params="label">label.invoke(new Message("/temp_setting"));</method>
                     </behavior>
                 </label>
             </column>
             <column top="0" left="0" bottom="0" right="0">
                 <label string="'Soil Humidity'">
                     <behavior like="ButtonBehavior_wet">
+                        <method id="onTap" params="label">label.invoke(new Message("/water_setting"));</method>
                     </behavior>
                 </label>
                 <label string="'50 %'">
                     <behavior like="ButtonBehavior_wet_num">
+                        <method id="onTap" params="label">label.invoke(new Message("/water_setting"));</method>
                     </behavior>
                 </label>
             </column>
             <column top="0" left="0" bottom="0" right="0">
                 <label string="'Luminance'">
                     <behavior like="ButtonBehavior_light">
+                        <method id="onTap" params="label">label.invoke(new Message("/light_setting"));</method>
                     </behavior>
                 </label>
                 <label string="'70 lx'">
                     <behavior like="ButtonBehavior_light_num">
+                        <method id="onTap" params="label">label.invoke(new Message("/light_setting"));</method>
                     </behavior>
                 </label>
             </column>
         </line>
         <line left="0" right="0" height="100">
-            <label string="'Watering'">
+            <label string="'watering'">
                 <behavior like="ButtonBehavior_water">
-                    <method id="onTap" params="label">label.invoke(new Message("/Watering"));</method>
+                    <method id="onTap" params="label">trace("water");</method>
                 </behavior>
             </label>
             <label string="'LED'">
                 <behavior like="ButtonBehavior_led">
-                    <method id="onTap" params="label">label.invoke(new Message("/led"));</method>
+                    <method id="onTap" params="label">trace("led");</method>
                 </behavior>
             </label>
         </line>
     </column>
 </container>
-    
+
     <script><![CDATA[
     application.invoke( new MessageWithObject( "pins:configure", {
         	analogSensor: {
@@ -330,9 +338,40 @@
     application.add( new MainScreen(data) );
     
     ]]></script>
-    
-
-    <handler path="/Watering">
+    <handler path="/temp_setting">
+        <behavior like="MODEL.DialogBehavior">
+            <method id="onDescribe" params="query">
+                return {
+                    Dialog: DIALOG.Box,
+                    title: "Temperature Setting",
+                    items: [
+                        {
+                            Item: DIALOG.Slider,
+                            id: "temp_min",
+                            label: "Set Min Temperature",
+                            min: 0,
+                            max: 100,
+                            value: temp_min,
+                            toString: function(val) { return Math.floor(val); }, 
+                        },
+                        {
+                            Item: DIALOG.Slider,
+                            id: "temp_max",
+                            label: "Set Max Temperature",
+                            min: 0,
+                            max: 100,
+                            value: temp_max,
+                            toString: function(val) { return Math.floor(val); }, 
+                        }
+                    ],
+                    ok: "Comfirm",
+                    cancel: "Close",
+                    action: "/temp_set",
+                };
+            </method>
+        </behavior>
+    </handler>
+    <handler path="/water_setting">
         <behavior like="MODEL.DialogBehavior">
             <method id="onDescribe" params="query">
                 return {
@@ -341,28 +380,23 @@
                     items: [
                         {
                             Item: DIALOG.Slider,
-                            id: "slider",
+                            id: "humi_exp",
                             label: "Set Soil Humidity",
                             min: 0,
                             max: 100,
-                            value: exp_wet,
+                            value: humi_exp,
                             toString: function(val) { return Math.floor(val); }, 
-                        },
-                        {
-                            Item: DIALOG.CheckboxRight,
-                            id: "enable_check",
-                            label: "Enable",
-                        },
+                        }
                     ],
-                    ok: "Go!",
+                    ok: "Comfirm",
                     cancel: "Close",
-                    action: "/printResult",
+                    action: "/water_set",
                 };
             </method>
         </behavior>
     </handler>
 
-    <handler path="/led">
+    <handler path="/light_setting">
         <behavior like="MODEL.DialogBehavior">
              <method id="onDescribe" params="query">
                 return {
@@ -371,31 +405,51 @@
                     items: [
                         {
                             Item: DIALOG.Slider,
-                            id: "slider",
+                            id: "lumi_exp",
                             label: "Set Luminance",
                             min: 0,
                             max: 100,
-                            value: exp_light,
+                            value: lumi_exp,
                             toString: function(val) { return Math.floor(val); }, 
-                        },
-                        {
-                            Item: DIALOG.CheckboxRight,
-                            id: "enable_check",
-                            label: "Enable",
-                        },
+                        }
                     ],
-                    ok: "Go!",
+                    ok: "Comfirm",
                     cancel: "Close",
-                    action: "/printResult",
+                    action: "/light_set",
                 };
             </method>
         </behavior>
-    </handler>
+    </handler> 
 
-    <handler path="/printResult">
+
+    <handler path="/temp_set">
         <behavior like="MODEL.CommandBehavior">
             <method id="onQuery" params="handler, query">
                 for (var key in query) {
+                    if(key == "temp_min")
+                        temp_min = query[key];
+                    else 
+                        temp_max = query[key];
+                    trace(key + ": " + query[key] + "\n");
+                }
+            </method>
+        </behavior>
+    </handler>
+    <handler path="/water_set">
+        <behavior like="MODEL.CommandBehavior">
+            <method id="onQuery" params="handler, query">
+                for (var key in query) {
+                        humi_exp = query[key];
+                    trace(key + ": " + query[key] + "\n");
+                }
+            </method>
+        </behavior>
+    </handler>
+    <handler path="/light_set">
+        <behavior like="MODEL.CommandBehavior">
+            <method id="onQuery" params="handler, query">
+                for (var key in query) {
+                        lumi_exp = query[key];
                     trace(key + ": " + query[key] + "\n");
                 }
             </method>
