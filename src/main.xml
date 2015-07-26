@@ -265,7 +265,7 @@
         </method>
         <method id="LedOff" params="label">
             label.string ="LED:OFF";
-            led_sts = 1;
+            led_sts = 0;
         </method>
     </behavior>
 
