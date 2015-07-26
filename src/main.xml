@@ -23,6 +23,8 @@
     <variable id="temp_min" value="0"/>
     <variable id="temp_max" value="0"/>
    	<variable id="lumi_exp" value="0"/>
+    <variable id="led_sts" value="0"/>
+    <variable id="water_sts" value="0"/>
     <!-- ASSETS -->
 
     <skin id="backgroundSkin" color="#000000"/>
@@ -217,10 +219,17 @@
         </method>
         <method id="onTouchEnded" params="label">
             label.skin = button_water_Skin;
-            this.onTap(label);
+            led_sts = 1 - led_sts;
+            if(led_sts == 1)
+                this.LedOn(label);
+            else
+                this.LedOff(label);
         </method>
-        <method id="onTap" params="label">
-             trace(label.string);
+        <method id="LedOn" params="label">
+            label.string ="LED:ON";
+        </method>
+        <method id="LedOff" params="label">
+            label.string ="LED:OFF";
         </method>
     </behavior>
     
@@ -236,10 +245,17 @@
         </method>
         <method id="onTouchEnded" params="label">
             label.skin = button_led_Skin;
-            this.onTap(label);
+            led_sts = 1 - led_sts;
+            if(led_sts == 1)
+                this.LedOn(label);
+            else
+                this.LedOff(label);
         </method>
-        <method id="onTap" params="label">
-             trace(label.string);
+        <method id="LedOn" params="label">
+            label.string ="LED:ON";
+        </method>
+        <method id="LedOff" params="label">
+            label.string ="LED:OFF";
         </method>
     </behavior>
 
