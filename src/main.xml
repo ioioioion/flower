@@ -24,7 +24,9 @@
     <variable id="temp_max" value="0"/>
    	<variable id="lumi_exp" value="0"/>
     <variable id="led_sts" value="0"/>
+    <variable id="led_manual" value="0"/>
     <variable id="water_sts" value="0"/>
+    <variable id="water_manual" value="0"/>
     <!-- ASSETS -->
 
     <skin id="backgroundSkin" color="#000000"/>
@@ -246,6 +248,7 @@
         <method id="onTouchEnded" params="label">
             label.skin = button_led_Skin;
             led_sts = 1 - led_sts;
+            led_manual = 1 - led_manual;
             if(led_sts == 1)
                 this.LedOn(label);
             else
