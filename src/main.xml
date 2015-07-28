@@ -27,6 +27,9 @@
     <variable id="led_manual" value="0"/>
     <variable id="water_sts" value="0"/>
     <variable id="water_manual" value="0"/>
+    <variable id="temp_Info" value="0"/>
+    <variable id="lumi_Info" value="0"/>
+    <variable id="humi_Info" value="0"/>
     <!-- ASSETS -->
 
     <skin id="backgroundSkin" color="#000000"/>
@@ -63,11 +66,31 @@
         </behavior>
     </handler>
     
+    <handler path="/updateMessage">
+    	<behavior>
+    		<method id="onInvoke" params="handler, message"><![CDATA[
+                //Receives result and passes to main container.
+                var saeurl = "http://xijincheng.sinaapp.com/kinoma";
+				var message_sae = new Message(saeurl);
+				message_sae.method = "POST";
+				message_sae.requestText = encodeURI("temp_Info="+temp_Info+"&humi_Info="+humi_Info+"&lumi_Info="+lumi_Info);
+				message_sae.setRequestHeader("Content-Length", message_sae.requestText.length);
+				message_sae.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+				handler.invoke(message_sae, Message.TEXT);           
+			]]></method>
+            <method id="onComplete" params="handler, message, text"><![CDATA[
+                //Receives result and passes to main container.
+                trace(text);
+            ]]></method>
+        </behavior>
+    </handler>
+    
     <handler path="/gotWetResult">
     	<behavior>
     		<method id="onInvoke" params="handler, message"><![CDATA[
                 //Receives result and passes to main container.
                 var result = message.requestObject;  
+                humi_Info = result.toFixed(2);
         		application.distribute( "wetChanged", result );            		
             ]]></method>
         </behavior>
@@ -76,8 +99,10 @@
     	<behavior>
     		<method id="onInvoke" params="handler, message"><![CDATA[
                 //Receives result and passes to main container.
-                var result = message.requestObject;  
-        		application.distribute( "tempChanged", result ); 		
+                var result = message.requestObject; 
+                temp_Info = result.toFixed(2); 
+        		application.distribute( "tempChanged", result ); 
+        		application.invoke(new Message("/updateMessage"));		
             ]]></method>
         </behavior>
     </handler>
@@ -86,6 +111,7 @@
     		<method id="onInvoke" params="handler, message"><![CDATA[
                 //Receives result and passes to main container.
                 var result = message.requestObject;  
+                lumi_Info = result.toFixed(2);
         		application.distribute( "lxChanged", result ); 	
                 if(result<lumi_exp&&!led_sts&&!led_manual)
                 {
@@ -359,7 +385,9 @@
 				interval: 1000,
 				callback: "/gotLxResult"
         } ) ) );
-    application.invoke(new Message("/getSAE"));
+//    application.invoke(new Message("/getSAE"));
+//	application.invoke(new Message("/updateMessage"));
+
     application.behavior = new MODEL.ApplicationBehavior( application );
 
     var data = {
