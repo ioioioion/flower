@@ -68,7 +68,11 @@
     		<method id="onInvoke" params="handler, message"><![CDATA[
                 //Receives result and passes to main container.
                 var result = message.requestObject;  
-        		application.distribute( "wetChanged", result );            		
+        		application.distribute( "wetChanged", result );    
+                if(result<humi_exp&&!water_sts)
+                {
+                    application.distribute( "WaterOn"); 
+                }        		
             ]]></method>
         </behavior>
     </handler>
@@ -228,12 +232,12 @@
         <method id="onTouchEnded" params="label">
             label.skin = button_water_Skin;
             if(water_sts == 0){
-            this.WaterOn(label);
-            label.interval = 2000;
-            label.start();   
+            this.WaterOn(label);  
             }
         </method>
         <method id="WaterOn" params="label">
+            label.interval = 2000;
+            label.start(); 
             label.string ="Water:ON";
             water_sts = 1;
         </method>
