@@ -90,20 +90,12 @@
     		<method id="onInvoke" params="handler, message"><![CDATA[
                 //Receives result and passes to main container.
                 var result = message.requestObject;  
-<<<<<<< HEAD
                 humi_Info = result.toFixed(2);
         		application.distribute( "wetChanged", result );    
         		if(result<humi_exp&&!water_sts)
                 {
                     application.distribute( "WaterOn"); 
                 }     		
-=======
-        		application.distribute( "wetChanged", result );    
-                if(result<humi_exp&&!water_sts)
-                {
-                    application.distribute( "WaterOn"); 
-                }        		
->>>>>>> 3b7febfe126d755b4264e58b0909d619df2277ef
             ]]></method>
         </behavior>
     </handler>
@@ -125,10 +117,10 @@
                 var result = message.requestObject;  
                 lumi_Info = result.toFixed(2);
         		application.distribute( "lxChanged", result ); 	
-                if(result<lumi_exp&&!led_sts&&!led_manual)
+                if(eval(result)<eval(lumi_exp)&&led_sts==0&&led_manual==0)
                 {
                     application.distribute( "LedOn"); 
-                } else if (result>lumi_exp+100&&!led_manual){
+                } else if (eval(result)>eval(lumi_exp)+100&&led_manual==0){
                     application.distribute( "LedOff"); 
                 }
             ]]></method>
