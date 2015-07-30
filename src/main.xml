@@ -90,12 +90,20 @@
     		<method id="onInvoke" params="handler, message"><![CDATA[
                 //Receives result and passes to main container.
                 var result = message.requestObject;  
+<<<<<<< HEAD
                 humi_Info = result.toFixed(2);
         		application.distribute( "wetChanged", result );    
         		if(result<humi_exp&&!water_sts)
                 {
                     application.distribute( "WaterOn"); 
                 }     		
+=======
+        		application.distribute( "wetChanged", result );    
+                if(result<humi_exp&&!water_sts)
+                {
+                    application.distribute( "WaterOn"); 
+                }        		
+>>>>>>> 3b7febfe126d755b4264e58b0909d619df2277ef
             ]]></method>
         </behavior>
     </handler>
@@ -258,12 +266,12 @@
         <method id="onTouchEnded" params="label">
             label.skin = button_water_Skin;
             if(water_sts == 0){
-            this.WaterOn(label);
-            label.interval = 2000;
-            label.start();   
+            this.WaterOn(label);  
             }
         </method>
         <method id="WaterOn" params="label">
+            label.interval = 2000;
+            label.start(); 
             label.string ="Water:ON";
             water_sts = 1;
             application.invoke( new MessageWithObject( "pins:/analogSensor/wateron"  ) );
