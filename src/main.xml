@@ -92,7 +92,7 @@
                 var result = message.requestObject;  
                 humi_Info = result.toFixed(2);
         		application.distribute( "wetChanged", result );    
-        		if(result<humi_exp&&!water_sts)
+        		if(eval(result)<eval(humi_exp)&&!water_sts)
                 {
                     application.distribute( "WaterOn"); 
                 }     		
