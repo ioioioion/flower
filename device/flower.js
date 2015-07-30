@@ -24,6 +24,22 @@ exports.pins = {
     
 };
 
+exports.ledon = function() {
+	this.led.write(0);
+}
+
+exports.ledoff = function() {
+	this.led.write(1);
+}
+
+exports.wateron = function() {
+	this.watering.write(0);
+}
+
+exports.wateroff = function() {
+	this.watering.write(1);
+}
+
 exports.configure = function () {
     this.wetSensor.init();
     this.i2cTemp.init();
@@ -31,6 +47,9 @@ exports.configure = function () {
     this.led.init();
     this.watering.init();
     this.i2cLumin.writeByteDataSMB(0x80,0x03);
+    this.led.write(1);
+    this.watering.write(1);
+    
 }
 
 exports.wetread = function() {

@@ -90,7 +90,15 @@
 		var axes = this.pinsSimulator.delegate("getValue");
 		return axes.LuminosityValue;				
 	]]></function>
-
+	
+	<function id="ledon"><![CDATA[
+this.pinsSimulator.delegate("setValue", "ledValue", 0);	]]></function>
+	<function id="ledoff"><![CDATA[
+this.pinsSimulator.delegate("setValue", "ledValue", 1);	]]></function>
+	<function id="wateron"><![CDATA[
+this.pinsSimulator.delegate("setValue", "wateringValue", 0);	]]></function>
+	<function id="wateroff"><![CDATA[
+this.pinsSimulator.delegate("setValue", "wateringValue", 1);	]]></function>
 	<script><![CDATA[
 		exports.pins = {
 			wetSensor: { type: "A2D" },

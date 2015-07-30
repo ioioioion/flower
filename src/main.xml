@@ -91,7 +91,11 @@
                 //Receives result and passes to main container.
                 var result = message.requestObject;  
                 humi_Info = result.toFixed(2);
-        		application.distribute( "wetChanged", result );            		
+        		application.distribute( "wetChanged", result );    
+        		if(result<humi_exp&&!water_sts)
+                {
+                    application.distribute( "WaterOn"); 
+                }     		
             ]]></method>
         </behavior>
     </handler>
@@ -262,10 +266,14 @@
         <method id="WaterOn" params="label">
             label.string ="Water:ON";
             water_sts = 1;
+            application.invoke( new MessageWithObject( "pins:/analogSensor/wateron"  ) );
+            
         </method>
         <method id="WaterOff" params="label">
             label.string ="Water:OFF";
             water_sts = 0;
+            application.invoke( new MessageWithObject( "pins:/analogSensor/wateroff"  ) );
+            
         </method>
 		<method id="onTimeChanged" params="label"><![CDATA[
 		    label.stop();   
@@ -285,7 +293,10 @@
         </method>
         <method id="onTouchEnded" params="label">
             label.skin = button_led_Skin;
-            led_manual = 1 - led_manual;
+            if(led_manual == 0)
+                led_manual=1;
+            else
+                led_manual=0;
             if(led_sts == 0)
                 this.LedOn(label);
             else
@@ -294,10 +305,13 @@
         <method id="LedOn" params="label">
             label.string ="LED:ON";
             led_sts = 1;
+            application.invoke( new MessageWithObject( "pins:/analogSensor/ledon"  ) );
         </method>
         <method id="LedOff" params="label">
             label.string ="LED:OFF";
             led_sts = 0;
+            application.invoke( new MessageWithObject( "pins:/analogSensor/ledoff"  ) );
+            
         </method>
     </behavior>
 
@@ -362,8 +376,8 @@
                     wetSensor: { pin: 58 },
                     i2cTemp: { sda: 55, clock: 56 },  
                     i2cLumin: { sda: 60, clock: 61 },  
-                    watering:  { pin: 66 },
-                    led: { pin: 64 }            
+                    watering:  { pin: 4 },
+                    led: { pin: 6 }            
                 }
             }
         } ) );
@@ -466,7 +480,7 @@
                             id: "lumi_exp",
                             label: "Set Luminance",
                             min: 0,
-                            max: 100,
+                            max: 10000,
                             value: lumi_exp,
                             toString: function(val) { return Math.floor(val); }, 
                         }
