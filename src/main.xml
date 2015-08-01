@@ -25,6 +25,7 @@
    	<variable id="lumi_exp" value="0"/>
     <variable id="led_sts" value="0"/>
     <variable id="led_auto" value="0"/>
+    <variable id="water_auto" value="0"/>
     <variable id="water_sts" value="0"/>
     <variable id="water_manual" value="0"/>
     <variable id="temp_Info" value="0"/>
@@ -102,7 +103,7 @@
                 var result = message.requestObject;  
                 humi_Info = result.toFixed(2);
         		application.distribute( "wetChanged", result );    
-        		if(eval(result)<eval(humi_exp)&&!water_sts)
+        		if(eval(result)<eval(humi_exp)&&!water_sts&&water_auto==1)
                 {
                     application.distribute( "WaterOn"); 
                 }     		
@@ -127,10 +128,10 @@
                 var result = message.requestObject;  
                 lumi_Info = result.toFixed(2);
         		application.distribute( "lxChanged", result ); 	
-                if(eval(result)<eval(lumi_exp)&&led_sts==0&&led_manual==0)
+                if(eval(result)<eval(lumi_exp)&&led_sts==0&&led_auto==1)
                 {
                     application.distribute( "LedOn"); 
-                } else if (eval(result)>eval(lumi_exp)+100&&led_manual==0){
+                } else if (eval(result)>eval(lumi_exp)+100&&led_auto==1){
                     application.distribute( "LedOff"); 
                 }
             ]]></method>
@@ -367,24 +368,28 @@
             label.active = true;
         </method>
         <method id="onTouchBegan" params="label">
+            if(water_auto==0)
             label.skin = hiliteSkin;
+            else
+            label.skin = graySkin;
         </method>
         <method id="onTouchEnded" params="label">
+            if(water_auto==0){
             label.skin = button_water_Skin;
             if(water_sts == 0){
             this.WaterOn(label);  
-            }
+            }}
         </method>
         <method id="WaterOn" params="label">
             label.interval = 2000;
             label.start(); 
-            label.string ="Water:ON";
+            label.string ="ON";
             water_sts = 1;
             application.invoke( new MessageWithObject( "pins:/analogSensor/wateron"  ) );
             
         </method>
         <method id="WaterOff" params="label">
-            label.string ="Water:OFF";
+            label.string ="OFF";
             water_sts = 0;
             application.invoke( new MessageWithObject( "pins:/analogSensor/wateroff"  ) );
             
@@ -393,75 +398,40 @@
 		    label.stop();   
             this.WaterOff(label);
 		]]></method>
+        <method id="watergraySkinChanged" params="label">
+            label.skin =graySkin;
+        </method>
+        <method id="waterSkinChanged" params="label">
+            label.skin =button_water_Skin;
+        </method>
     </behavior>
     
-    <behavior id="ButtonBehavior_led">
-        <method id="onCreate" params="label">
-            label.coordinates = {top:1, bottom:1, left:1, right:1};
-            label.skin = button_led_Skin;
-            label.style = biglabelStyle;
-            label.active = true;
-        </method>
-        <method id="onTouchBegan" params="label">
-            label.skin = hiliteSkin;
-        </method>
-        <method id="onTouchEnded" params="label">
-            label.skin = button_led_Skin;
-            if(led_manual == 0)
-                led_manual=1;
-            else
-                led_manual=0;
-            if(led_sts == 0)
-                this.LedOn(label);
-            else
-                this.LedOff(label);
-        </method>
-        <method id="LedOn" params="label">
-            label.string ="LED:ON";
-            led_sts = 1;
-            application.invoke( new MessageWithObject( "pins:/analogSensor/ledon"  ) );
-        </method>
-        <method id="LedOff" params="label">
-            label.string ="LED:OFF";
-            led_sts = 0;
-            application.invoke( new MessageWithObject( "pins:/analogSensor/ledoff"  ) );
-            
-        </method>
-    </behavior>
+    
    <behavior id="ButtonBehavior_water_auto">
         <method id="onCreate" params="label">
             label.coordinates = {top:1, bottom:1, left:1, right:1};
             label.skin = button_water_Skin_L;
             label.style = biglabelStyle;
             label.active = true;
+            label.string = "Manual";
         </method>
         <method id="onTouchBegan" params="label">
             label.skin = hiliteSkin;
         </method>
         <method id="onTouchEnded" params="label">
             label.skin = button_water_Skin_L;
-            if(water_sts == 0){
-            this.WaterOn(label);  
+            if(water_auto==0){
+            water_auto=1;
+            label.string = "Auto";
+            application.distribute( "watergraySkinChanged");
+            }
+            else{
+            water_auto=0;
+            label.string = "Manual";
+            application.distribute( "waterSkinChanged");
             }
         </method>
-        <method id="WaterOn" params="label">
-            label.interval = 2000;
-            label.start(); 
-            label.string ="Water:ON";
-            water_sts = 1;
-            application.invoke( new MessageWithObject( "pins:/analogSensor/wateron"  ) );
-            
-        </method>
-        <method id="WaterOff" params="label">
-            label.string ="Water:OFF";
-            water_sts = 0;
-            application.invoke( new MessageWithObject( "pins:/analogSensor/wateroff"  ) );
-            
-        </method>
-		<method id="onTimeChanged" params="label"><![CDATA[
-		    label.stop();   
-            this.WaterOff(label);
-		]]></method>
+
     </behavior>
     
     <behavior id="ButtonBehavior_led_auto">
@@ -480,10 +450,12 @@
             if(led_auto==0){
             led_auto=1;
             label.string = "Auto";
+            application.distribute( "ledgraySkinChanged");
             }
             else{
             led_auto=0;
             label.string = "Manual";
+            application.distribute( "ledSkinChanged");
             }
         </method>
     </behavior>
@@ -499,11 +471,14 @@
             label.active = true;
         </method>
         <method id="onTouchBegan" params="label">
+            if(led_auto==0)
             label.skin = hiliteSkin;
+            else
+            label.skin = graySkin;
         </method>
         <method id="onTouchEnded" params="label">
-            label.skin = button_led_Skin_L;
             if(led_auto==0){
+            label.skin = button_led_Skin_L;
             if(led_sts==0){
             led_sts=1;
             this.LedOn(label);
@@ -514,15 +489,21 @@
             } }
         </method>
         <method id="LedOn" params="label">
-            label.string ="LED:ON";
+            label.string ="ON";
             led_sts = 1;
             application.invoke( new MessageWithObject( "pins:/analogSensor/ledon"  ) );
         </method>
         <method id="LedOff" params="label">
-            label.string ="LED:OFF";
+            label.string ="OFF";
             led_sts = 0;
             application.invoke( new MessageWithObject( "pins:/analogSensor/ledoff"  ) );
             
+        </method>
+        <method id="ledgraySkinChanged" params="label">
+            label.skin =graySkin;
+        </method>
+        <method id="ledSkinChanged" params="label">
+            label.skin =button_led_Skin_L;
         </method>
     </behavior>
 
@@ -535,7 +516,7 @@
            
                     </behavior>
                 </label>
-                <label string="'50 °C'">
+                <label string="'0 °C'">
                     <behavior like="ButtonBehavior_temp_num">
                        
                     </behavior>
@@ -547,7 +528,7 @@
 
                     </behavior>
                 </label>
-                <label string="'50 %'">
+                <label string="'0 %'">
                     <behavior like="ButtonBehavior_wet_num">
 
                     </behavior>
@@ -559,7 +540,7 @@
 
                     </behavior>
                 </label>
-                <label string="'70 lx'">
+                <label string="'0 lx'">
                     <behavior like="ButtonBehavior_light_num">
 
                     </behavior>
@@ -591,7 +572,7 @@
                         <method id="onTap" params="label">label.invoke(new Message("/water_setting"));</method>
                     </behavior>
                 </label>
-                <label string="'50 %'">
+                <label string="'0 %'">
                     <behavior like="ButtonBehavior_expwet_num_setting">
                         <method id="onTap" params="label">label.invoke(new Message("/water_setting"));</method>
                         <method id="humiChanged" params="label"><![CDATA[
@@ -606,7 +587,7 @@
                         <method id="onTap" params="label">label.invoke(new Message("/light_setting"));</method>
                     </behavior>
                 </label>
-                <label string="'70 lx'">
+                <label string="'0 lx'">
                     <behavior like="ButtonBehavior_explig_num_setting">
                         <method id="onTap" params="label">label.invoke(new Message("/light_setting"));</method>
                         <method id="lumiChanged" params="label"><![CDATA[
