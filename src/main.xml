@@ -24,26 +24,36 @@
     <variable id="temp_max" value="0"/>
    	<variable id="lumi_exp" value="0"/>
     <variable id="led_sts" value="0"/>
-    <variable id="led_manual" value="0"/>
+    <variable id="led_auto" value="0"/>
     <variable id="water_sts" value="0"/>
     <variable id="water_manual" value="0"/>
     <variable id="temp_Info" value="0"/>
     <variable id="lumi_Info" value="0"/>
     <variable id="humi_Info" value="0"/>
     <!-- ASSETS -->
-
+    
     <skin id="backgroundSkin" color="#000000"/>
-    <skin id="button_temp_Skin" color="#4169E1"/>
-    <skin id="button_wet_Skin" color="#6A5ACD"/>
-    <skin id="button_light_Skin" color="#FF4040"/>
-    <skin id="button_water_Skin" color="#00CD00"/>
-    <skin id="button_led_Skin" color="#FF8C00"/>
+    <skin id="graySkin" color="#888888"/>
+    <skin id="button_temp_Skin" color="#2B5797"/>
+    <skin id="button_wet_Skin" color="#1E7145"/>
+    <skin id="button_light_Skin" color="#FFC40D"/>
+
+    <skin id="button_temp_Skin_L" color="#603CBA"/>
+    <skin id="button_wet_Skin_L" color="#1D1D1D"/>
+    <skin id="button_light_Skin_L" color="#00ABA9"/>
+    <skin id="button_water_Skin" color="#FF0097"/>
+    <skin id="button_water_Skin_L" color="#DA532C"/>
+    <skin id="button_led_Skin" color="#EE1111"/>
+
+    <skin id="button_led_Skin_L" color="#B91D47"/>
     <skin id="hiliteSkin" color="#333333"/>
     <skin id="dummuSkin" color="red"/>
     <style id="textStyle" font="16px" color="white" align="center,middle"/>
     <style id="headerStyle" font="bold 16px" color="#444" align="center,bottom"/>
     <style id="buttonStyle" font="bold 16px" color="white" align="center,middle"/>
     <style id="labelStyle" font="bold 16px" color="white" align="center,bottom"/>
+    <style id="b_smalllabelStyle" font="bold 20px" color="white" align="center,bottom"/>
+    <style id="t_smalllabelStyle" font="bold 20px" color="white" align="center,top"/>
     <style id="biglabelStyle" font="bold 24px" color="white" align="center,middle"/>
     <style id="numStyle" font="bold 26px" color="white" align="center,top"/>
     
@@ -145,6 +155,7 @@
              trace(label.string);
         </method>
     </behavior>
+    
         <behavior id="ButtonBehavior_temp_num">
         <method id="onCreate" params="label">
             label.coordinates = {top:0, bottom:1, left:1, right:1};
@@ -245,6 +256,109 @@
      ]]></method>
     </behavior>
     
+    <behavior id="ButtonBehavior_maxtemp_setting">
+        <method id="onCreate" params="label">
+            label.coordinates = {top:0, bottom:1, left:1, right:1};
+            label.skin = button_temp_Skin_L;
+            label.style = t_smalllabelStyle;
+            label.active = true;
+        </method>
+        <method id="onTouchBegan" params="label">
+        </method>
+        <method id="onTouchEnded" params="label">
+            label.skin = button_temp_Skin_L;
+            this.onTap(label);
+        </method>
+        <method id="onTap" params="label">
+             trace(label.string);
+        </method>
+    </behavior>
+    <behavior id="ButtonBehavior_mintemp_setting">
+        <method id="onCreate" params="label">
+            label.coordinates = {top:1, bottom:0, left:1, right:1};
+            label.skin = button_temp_Skin_L;
+            label.style = b_smalllabelStyle;
+            label.active = true;
+        </method>
+        <method id="onTouchBegan" params="label">
+        </method>
+        <method id="onTouchEnded" params="label">
+            label.skin = button_temp_Skin_L;
+            this.onTap(label);
+        </method>
+        <method id="onTap" params="label">
+             trace(label.string);
+        </method>
+    </behavior>
+    <behavior id="ButtonBehavior_expwet_num_setting">
+        <method id="onCreate" params="label">
+            label.coordinates = {top:0, bottom:1, left:1, right:1};
+            label.skin = button_wet_Skin_L;
+            label.style = t_smalllabelStyle;
+            label.active = true;
+        </method>
+        <method id="onTouchBegan" params="label">
+        </method>
+        <method id="onTouchEnded" params="label">
+            label.skin = button_wet_Skin_L;
+            this.onTap(label);
+        </method>
+        <method id="onTap" params="label">
+             trace(label.string);
+        </method>
+    </behavior>
+    <behavior id="ButtonBehavior_expwet_setting">
+        <method id="onCreate" params="label">
+            label.coordinates = {top:1, bottom:0, left:1, right:1};
+            label.skin = button_wet_Skin_L;
+            label.style = b_smalllabelStyle;
+            label.active = true;
+        </method>
+        <method id="onTouchBegan" params="label">
+        </method>
+        <method id="onTouchEnded" params="label">
+            label.skin = button_wet_Skin_L;
+            this.onTap(label);
+        </method>
+        <method id="onTap" params="label">
+             trace(label.string);
+        </method>
+    </behavior>
+    <behavior id="ButtonBehavior_explig_num_setting">
+        <method id="onCreate" params="label">
+            label.coordinates = {top:0, bottom:1, left:1, right:1};
+            label.skin = button_light_Skin_L;
+            label.style = t_smalllabelStyle;
+            label.active = true;
+        </method>
+        <method id="onTouchBegan" params="label">
+        </method>
+        <method id="onTouchEnded" params="label">
+            label.skin = button_light_Skin_L;
+            this.onTap(label);
+        </method>
+        <method id="onTap" params="label">
+             trace(label.string);
+        </method>
+    </behavior>
+    <behavior id="ButtonBehavior_explig_setting">
+        <method id="onCreate" params="label">
+            label.coordinates = {top:1, bottom:0, left:1, right:1};
+            label.skin = button_light_Skin_L;
+            label.style = b_smalllabelStyle;
+            label.active = true;
+        </method>
+        <method id="onTouchBegan" params="label">
+        </method>
+        <method id="onTouchEnded" params="label">
+            label.skin = button_light_Skin_L;
+            this.onTap(label);
+        </method>
+        <method id="onTap" params="label">
+             trace(label.string);
+        </method>
+    </behavior>
+    
     <behavior id="ButtonBehavior_water">
         <method id="onCreate" params="label">
             label.coordinates = {top:1, bottom:1, left:1, right:1};
@@ -314,54 +428,209 @@
             
         </method>
     </behavior>
+   <behavior id="ButtonBehavior_water_auto">
+        <method id="onCreate" params="label">
+            label.coordinates = {top:1, bottom:1, left:1, right:1};
+            label.skin = button_water_Skin_L;
+            label.style = biglabelStyle;
+            label.active = true;
+        </method>
+        <method id="onTouchBegan" params="label">
+            label.skin = hiliteSkin;
+        </method>
+        <method id="onTouchEnded" params="label">
+            label.skin = button_water_Skin_L;
+            if(water_sts == 0){
+            this.WaterOn(label);  
+            }
+        </method>
+        <method id="WaterOn" params="label">
+            label.interval = 2000;
+            label.start(); 
+            label.string ="Water:ON";
+            water_sts = 1;
+            application.invoke( new MessageWithObject( "pins:/analogSensor/wateron"  ) );
+            
+        </method>
+        <method id="WaterOff" params="label">
+            label.string ="Water:OFF";
+            water_sts = 0;
+            application.invoke( new MessageWithObject( "pins:/analogSensor/wateroff"  ) );
+            
+        </method>
+		<method id="onTimeChanged" params="label"><![CDATA[
+		    label.stop();   
+            this.WaterOff(label);
+		]]></method>
+    </behavior>
+    
+    <behavior id="ButtonBehavior_led_auto">
+        <method id="onCreate" params="label">
+            label.coordinates = {top:1, bottom:1, left:1, right:1};
+            label.skin = button_led_Skin;
+            label.style = biglabelStyle;
+            label.active = true;
+            label.string = "Manual";
+        </method>
+        <method id="onTouchBegan" params="label">
+            label.skin = hiliteSkin;
+        </method>
+        <method id="onTouchEnded" params="label">
+            label.skin = button_led_Skin;
+            if(led_auto==0){
+            led_auto=1;
+            label.string = "Auto";
+            }
+            else{
+            led_auto=0;
+            label.string = "Manual";
+            }
+        </method>
+    </behavior>
+    
+    <behavior id="ButtonBehavior_led">
+        <method id="onCreate" params="label">
+            label.coordinates = {top:1, bottom:1, left:1, right:1};
+            if(led_auto==0)
+            label.skin = button_led_Skin_L;
+            else
+            label.skin = graySkin;
+            label.style = biglabelStyle;
+            label.active = true;
+        </method>
+        <method id="onTouchBegan" params="label">
+            label.skin = hiliteSkin;
+        </method>
+        <method id="onTouchEnded" params="label">
+            label.skin = button_led_Skin_L;
+            if(led_auto==0){
+            if(led_sts==0){
+            led_sts=1;
+            this.LedOn(label);
+            }
+            else{
+            led_sts=0;
+            this.LedOff(label);
+            } }
+        </method>
+        <method id="LedOn" params="label">
+            label.string ="LED:ON";
+            led_sts = 1;
+            application.invoke( new MessageWithObject( "pins:/analogSensor/ledon"  ) );
+        </method>
+        <method id="LedOff" params="label">
+            label.string ="LED:OFF";
+            led_sts = 0;
+            application.invoke( new MessageWithObject( "pins:/analogSensor/ledoff"  ) );
+            
+        </method>
+    </behavior>
 
 <container id="MainScreen" top="0" left="0" bottom="0" right="0" skin="backgroundSkin">
     <column width="320">
-        <line left="0" right="0" height="140">
+        <line left="0" right="0" height="90">
             <column top="0" left="0" bottom="0" right="0">
                 <label string="'Temperature'">
                     <behavior like="ButtonBehavior_temp">
-                        <method id="onTap" params="label">label.invoke(new Message("/temp_setting"));</method>
+           
                     </behavior>
                 </label>
                 <label string="'50 °C'">
                     <behavior like="ButtonBehavior_temp_num">
-                        <method id="onTap" params="label">label.invoke(new Message("/temp_setting"));</method>
+                       
                     </behavior>
                 </label>
             </column>
             <column top="0" left="0" bottom="0" right="0">
                 <label string="'Soil Humidity'">
                     <behavior like="ButtonBehavior_wet">
-                        <method id="onTap" params="label">label.invoke(new Message("/water_setting"));</method>
+
                     </behavior>
                 </label>
                 <label string="'50 %'">
                     <behavior like="ButtonBehavior_wet_num">
-                        <method id="onTap" params="label">label.invoke(new Message("/water_setting"));</method>
+
                     </behavior>
                 </label>
             </column>
             <column top="0" left="0" bottom="0" right="0">
                 <label string="'Luminance'">
                     <behavior like="ButtonBehavior_light">
-                        <method id="onTap" params="label">label.invoke(new Message("/light_setting"));</method>
+
                     </behavior>
                 </label>
                 <label string="'70 lx'">
                     <behavior like="ButtonBehavior_light_num">
-                        <method id="onTap" params="label">label.invoke(new Message("/light_setting"));</method>
+
                     </behavior>
                 </label>
             </column>
         </line>
-        <line left="0" right="0" height="100">
-            <label string="'watering'">
+        <line left="0" right="0" height="70">
+            <column top="0" left="0" bottom="0" right="0">
+                <label string="'Min:0 °C'">
+                    <behavior like="ButtonBehavior_mintemp_setting">
+                        <method id="onTap" params="label">label.invoke(new Message("/temp_setting"));</method>
+                        <method id="mintempChanged" params="label"><![CDATA[
+                   			 label.string= "Min:" + temp_min + " °C";
+    					 ]]></method>
+                    </behavior>
+                </label>
+                <label string="'Max:0 °C'">
+                    <behavior like="ButtonBehavior_maxtemp_setting">
+                        <method id="onTap" params="label">label.invoke(new Message("/temp_setting"));</method>
+                        <method id="maxtempChanged" params="label"><![CDATA[
+                   			 label.string= "Max:" + temp_max + " °C";
+    					 ]]></method>
+                    </behavior>
+                </label>
+            </column>
+            <column top="0" left="0" bottom="0" right="0">
+                <label string="'Expected:'">
+                    <behavior like="ButtonBehavior_expwet_setting">
+                        <method id="onTap" params="label">label.invoke(new Message("/water_setting"));</method>
+                    </behavior>
+                </label>
+                <label string="'50 %'">
+                    <behavior like="ButtonBehavior_expwet_num_setting">
+                        <method id="onTap" params="label">label.invoke(new Message("/water_setting"));</method>
+                        <method id="humiChanged" params="label"><![CDATA[
+                   			 label.string= humi_exp + " %";
+    					 ]]></method>
+                    </behavior>
+                </label>
+            </column>
+            <column top="0" left="0" bottom="0" right="0">
+                <label string="'Expected:'">
+                    <behavior like="ButtonBehavior_explig_setting">
+                        <method id="onTap" params="label">label.invoke(new Message("/light_setting"));</method>
+                    </behavior>
+                </label>
+                <label string="'70 lx'">
+                    <behavior like="ButtonBehavior_explig_num_setting">
+                        <method id="onTap" params="label">label.invoke(new Message("/light_setting"));</method>
+                        <method id="lumiChanged" params="label"><![CDATA[
+                   			 label.string= lumi_exp + " lx";
+    					 ]]></method>
+                    </behavior>
+                </label>
+            </column>
+        </line>
+        <line left="0" right="0" height="80">
+            <label string="'water'">
                 <behavior like="ButtonBehavior_water">
+                </behavior>
+            </label>
+            <label string="'Auto'">
+                <behavior like="ButtonBehavior_water_auto">
                 </behavior>
             </label>
             <label string="'LED'">
                 <behavior like="ButtonBehavior_led">
+                </behavior>
+            </label>
+            <label string="'Auto'">
+                <behavior like="ButtonBehavior_led_auto">
                 </behavior>
             </label>
         </line>
@@ -425,6 +694,7 @@
                             max: 100,
                             value: temp_min,
                             toString: function(val) { return Math.floor(val); }, 
+                            
                         },
                         {
                             Item: DIALOG.Slider,
@@ -499,9 +769,11 @@
             <method id="onQuery" params="handler, query">
                 for (var key in query) {
                     if(key == "temp_min")
-                        temp_min = query[key];
+                        temp_min = eval(query[key]).toFixed(0);
                     else 
-                        temp_max = query[key];
+                        temp_max = eval(query[key]).toFixed(0);
+                    application.distribute( "maxtempChanged", temp_max );
+                    application.distribute( "mintempChanged", temp_min );
                     trace(key + ": " + query[key] + "\n");
                 }
             </method>
@@ -511,7 +783,8 @@
         <behavior like="MODEL.CommandBehavior">
             <method id="onQuery" params="handler, query">
                 for (var key in query) {
-                        humi_exp = query[key];
+                        humi_exp = eval(query[key]).toFixed(0);
+                    application.distribute( "humiChanged", humi_exp );
                     trace(key + ": " + query[key] + "\n");
                 }
             </method>
@@ -521,8 +794,9 @@
         <behavior like="MODEL.CommandBehavior">
             <method id="onQuery" params="handler, query">
                 for (var key in query) {
-                        lumi_exp = query[key];
+                        lumi_exp = eval(query[key]).toFixed(0);
                     trace(key + ": " + query[key] + "\n");
+                    application.distribute( "lumiChanged", lumi_exp );
                 }
             </method>
         </behavior>
