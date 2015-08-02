@@ -84,7 +84,7 @@
                 var saeurl = "http://xijincheng.sinaapp.com/kinoma";
 				var message_sae = new Message(saeurl);
 				message_sae.method = "POST";
-				message_sae.requestText = encodeURI("temp_Info="+temp_Info+"&humi_Info="+humi_Info+"&lumi_Info="+lumi_Info+"&Min_temp="+temp_min+"&Max_temp="+temp_max+"&Exp_humi="+humi_exp+"&Exp_lumi="+lumi_exp);
+				message_sae.requestText = encodeURI("temp_Info="+temp_Info+"&humi_Info="+humi_Info+"&lumi_Info="+lumi_Info+"&Min_temp="+temp_min+"&Max_temp="+temp_max+"&Exp_humi="+humi_exp+"&Exp_lumi="+lumi_exp+"&lumi_auto"+led_auto+"&humi_auto"+water_auto);
 				message_sae.setRequestHeader("Content-Length", message_sae.requestText.length);
 				message_sae.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 				handler.invoke(message_sae, Message.JSON);           
@@ -106,6 +106,9 @@
 				trace(json.temp_max); 
 				trace(json.lumi_exp); 
 				trace(json.humi_exp); 
+                trace(json.humi_auto); 
+                trace(json.lumi_auto); 
+                                                		 
 
               }
             ]]></method>
