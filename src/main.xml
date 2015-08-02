@@ -96,11 +96,15 @@
                 temp_max=json.temp_max;
                 lumi_exp=json.lumi_exp;
                 humi_exp=json.humi_exp;
+                led_auto=json.lumi_auto;
+                water_auto=json.humi_auto;
                 
                 application.distribute( "maxtempChanged", temp_max );
                 application.distribute( "mintempChanged", temp_min );
                 application.distribute( "humiChanged", humi_exp );
                 application.distribute( "lumiChanged", lumi_exp );
+                application.distribute( "waterautoChanged", water_auto );
+                application.distribute( "ledautoChanged", led_auto );
                 
 				trace(json.temp_min); 
 				trace(json.temp_max); 
@@ -623,6 +627,9 @@
             </label>
             <label string="'Auto'">
                 <behavior like="ButtonBehavior_water_auto">
+                    <method id="waterautoChanged" params="label"><![CDATA[
+                   			 label.string= lumi_exp + " lx";
+    					 ]]></method>
                 </behavior>
             </label>
             <label string="'LED'">
