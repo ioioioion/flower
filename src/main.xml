@@ -84,14 +84,30 @@
                 var saeurl = "http://xijincheng.sinaapp.com/kinoma";
 				var message_sae = new Message(saeurl);
 				message_sae.method = "POST";
-				message_sae.requestText = encodeURI("temp_Info="+temp_Info+"&humi_Info="+humi_Info+"&lumi_Info="+lumi_Info);
+				message_sae.requestText = encodeURI("temp_Info="+temp_Info+"&humi_Info="+humi_Info+"&lumi_Info="+lumi_Info+"&Min_temp="+temp_min+"&Max_temp="+temp_max+"&Exp_humi="+humi_exp+"&Exp_lumi="+lumi_exp);
 				message_sae.setRequestHeader("Content-Length", message_sae.requestText.length);
 				message_sae.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-				handler.invoke(message_sae, Message.TEXT);           
+				handler.invoke(message_sae, Message.JSON);           
 			]]></method>
-            <method id="onComplete" params="handler, message, text"><![CDATA[
+            <method id="onComplete" params="handler, message, json"><![CDATA[
                 //Receives result and passes to main container.
-                trace(text);
+                if(json!=undefined){
+                temp_min=json.temp_min;
+                temp_max=json.temp_max;
+                lumi_exp=json.lumi_exp;
+                humi_exp=json.humi_exp;
+                
+                application.distribute( "maxtempChanged", temp_max );
+                application.distribute( "mintempChanged", temp_min );
+                application.distribute( "humiChanged", humi_exp );
+                application.distribute( "lumiChanged", lumi_exp );
+                
+				trace(json.temp_min); 
+				trace(json.temp_max); 
+				trace(json.lumi_exp); 
+				trace(json.humi_exp); 
+
+              }
             ]]></method>
         </behavior>
     </handler>
@@ -131,7 +147,7 @@
                 if(eval(result)<eval(lumi_exp)&&led_sts==0&&led_auto==1)
                 {
                     application.distribute( "LedOn"); 
-                } else if (eval(result)>eval(lumi_exp)+100&&led_auto==1){
+                } else if (eval(result)>eval(lumi_exp)+50&&led_auto==1){
                     application.distribute( "LedOff"); 
                 }
             ]]></method>
