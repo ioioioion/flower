@@ -644,7 +644,7 @@
         <line left="0" right="0" height="60">
             <behavior>
                 <method id="onCreate" params="line">
-                    line.skin = hiliteSkin;
+//                    line.skin = hiliteSkin;
                 </method>
             </behavior>
             <label string="'Water'">
