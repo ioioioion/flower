@@ -40,15 +40,17 @@
     <skin id="button_light_Skin" color="#FFC40D"/>
 
     <skin id="button_temp_Skin_L" color="#603CBA"/>
-    <skin id="button_wet_Skin_L" color="#1D1D1D"/>
+    <skin id="button_wet_Skin_L" color="#252525"/>
     <skin id="button_light_Skin_L" color="#00ABA9"/>
-    <skin id="button_water_Skin" color="#FF0097"/>
+    <skin id="button_water_Skin" color="#56C5ff"/>
     <skin id="button_water_Skin_L" color="#DA532C"/>
-    <skin id="button_led_Skin" color="#EE1111" texture="icon_on" x="0" y="0" width="60" height="60"/>
+    <skin id="button_led_Skin" color="#EE1111"/>
 
-    <skin id="button_led_Skin_L" color="#B91D47"/>
+    <skin id="button_led_Skin_L" color="#91d100"/>
     <skin id="hiliteSkin" color="#333333"/>
     <skin id="dummuSkin" color="red"/>
+    <style id="inactiveStyle" font="bold 24px" color="#CCCCCC" align="center,middle"/>
+    
     <style id="textStyle" font="16px" color="white" align="center,middle"/>
     <style id="headerStyle" font="bold 16px" color="#444" align="center,bottom"/>
     <style id="buttonStyle" font="bold 16px" color="white" align="center,middle"/>
@@ -508,7 +510,7 @@
             label.skin = button_led_Skin_L;
             else
             label.skin = graySkin;
-            label.style = biglabelStyle;
+            label.style = inactiveStyle;
             label.active = true;
         </method>
         <method id="onTouchBegan" params="label">
@@ -531,12 +533,12 @@
             }
         </method>
         <method id="LedOn" params="label">
-        //    label.string ="ON";
+            label.style = biglabelStyle;
             led_sts = 1;
             application.invoke( new MessageWithObject( "pins:/analogSensor/ledon"  ) );
         </method>
         <method id="LedOff" params="label">
-        //    label.string ="OFF";
+            label.style = inactiveStyle;
             led_sts = 0;
             application.invoke( new MessageWithObject( "pins:/analogSensor/ledoff"  ) );
             
