@@ -32,7 +32,7 @@
     <variable id="lumi_Info" value="0"/>
     <variable id="humi_Info" value="0"/>
     <!-- ASSETS -->
-    <texture id="icon_on" small="./assets/toggle_butt_on.png"/>
+    <texture id="icon_on" small="./assets/bdreader_seekbar_more_brightness_normal.png"/>
     <skin id="backgroundSkin" color="#000000"/>
     <skin id="graySkin" color="#888888"/>
     <skin id="button_temp_Skin" color="#2B5797"/>
@@ -44,7 +44,7 @@
     <skin id="button_light_Skin_L" color="#00ABA9"/>
     <skin id="button_water_Skin" color="#FF0097"/>
     <skin id="button_water_Skin_L" color="#DA532C"/>
-    <skin id="button_led_Skin" texture="icon_on" color="#EE1111" x="0" y="0" width="40" height="40"/>
+    <skin id="button_led_Skin" color="#EE1111" texture="icon_on" x="0" y="0" width="60" height="60"/>
 
     <skin id="button_led_Skin_L" color="#B91D47"/>
     <skin id="hiliteSkin" color="#333333"/>
@@ -551,7 +551,7 @@
 
 <container id="MainScreen" top="0" left="0" bottom="0" right="0" skin="backgroundSkin">
     <column width="320">
-        <line left="0" right="0" height="90">
+        <line left="0" right="0" height="80">
             <column top="0" left="0" bottom="0" right="0">
                 <label string="'Temperature'">
                     <behavior like="ButtonBehavior_temp">
@@ -589,7 +589,7 @@
                 </label>
             </column>
         </line>
-        <line left="0" right="0" height="70">
+        <line left="0" right="0" height="80">
             <column top="0" left="0" bottom="0" right="0">
                 <label string="'Min:0 °C'">
                     <behavior like="ButtonBehavior_mintemp_setting">
@@ -639,7 +639,12 @@
                 </label>
             </column>
         </line>
-        <line left="0" right="0" height="80">
+        <line left="0" right="0" height="60">
+            <behavior>
+                <method id="onCreate" params="line">
+                    line.skin = hiliteSkin;
+                </method>
+            </behavior>
             <label string="'Water'">
                 <behavior like="ButtonBehavior_water">
                 </behavior>
@@ -714,7 +719,7 @@
                             id: "temp_min",
                             label: "Set Min Temperature",
                             min: 0,
-                            max: 100,
+                            max: 50,
                             value: temp_min,
                             toString: function(val) { return Math.floor(val); }, 
                             
@@ -724,7 +729,7 @@
                             id: "temp_max",
                             label: "Set Max Temperature",
                             min: 0,
-                            max: 100,
+                            max: 50,
                             value: temp_max,
                             toString: function(val) { return Math.floor(val); }, 
                         }
