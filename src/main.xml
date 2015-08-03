@@ -32,7 +32,7 @@
     <variable id="lumi_Info" value="0"/>
     <variable id="humi_Info" value="0"/>
     <!-- ASSETS -->
-    
+    <texture id="icon_on" small="./assets/toggle_butt_on.png"/>
     <skin id="backgroundSkin" color="#000000"/>
     <skin id="graySkin" color="#888888"/>
     <skin id="button_temp_Skin" color="#2B5797"/>
@@ -44,7 +44,7 @@
     <skin id="button_light_Skin_L" color="#00ABA9"/>
     <skin id="button_water_Skin" color="#FF0097"/>
     <skin id="button_water_Skin_L" color="#DA532C"/>
-    <skin id="button_led_Skin" color="#EE1111"/>
+    <skin id="button_led_Skin" texture="icon_on" color="#EE1111" x="0" y="0" width="40" height="40"/>
 
     <skin id="button_led_Skin_L" color="#B91D47"/>
     <skin id="hiliteSkin" color="#333333"/>
@@ -91,29 +91,31 @@
 			]]></method>
             <method id="onComplete" params="handler, message, json"><![CDATA[
                 //Receives result and passes to main container.
-                if(json!=undefined){
-                temp_min=json.temp_min;
-                temp_max=json.temp_max;
-                lumi_exp=json.lumi_exp;
-                humi_exp=json.humi_exp;
-                led_auto=json.lumi_auto;
-                water_auto=json.humi_auto;
-                
-                application.distribute( "maxtempChanged", temp_max );
-                application.distribute( "mintempChanged", temp_min );
-                application.distribute( "humiChanged", humi_exp );
-                application.distribute( "lumiChanged", lumi_exp );
-                if(water_auto!=null)application.distribute( "waterautoChanged", water_auto );
-                if(led_auto!=null)application.distribute( "ledautoChanged", led_auto );
-                
-				trace(json.temp_min); 
-				trace(json.temp_max); 
-				trace(json.lumi_exp); 
-				trace(json.humi_exp); 
-                trace(json.humi_auto); 
-                trace(json.lumi_auto); 
-                                                		 
-
+                if(json!=undefined){         
+                if(json.humi_auto!=null){
+                    water_auto=json.humi_auto;
+                    application.distribute( "waterautoChanged" );
+                }
+                if(json.lumi_auto!=null){
+                    led_auto=json.lumi_auto;                   
+                    application.distribute( "ledautoChanged" );
+                }
+                if(json.temp_min!=null){
+                    temp_min=json.temp_min;                   
+                    application.distribute( "mintempChanged" );
+                }
+                if(json.temp_max!=null){
+                    temp_max=json.temp_max;                   
+                    application.distribute( "maxtempChanged" );
+                }
+                if(json.humi_exp!=null){
+                    humi_exp=json.humi_exp;                   
+                    application.distribute( "humiChanged" );
+                }
+                if(json.lumi_exp!=null){
+                    lumi_exp=json.lumi_exp;                   
+                    application.distribute( "lumiChanged" );
+                }                                               		 
               }
             ]]></method>
         </behavior>
@@ -390,42 +392,39 @@
             label.style = biglabelStyle;
             label.active = true;
         </method>
-        <method id="onTouchBegan" params="label">
-            if(water_auto==0)
-            label.skin = hiliteSkin;
-            else
-            label.skin = graySkin;
-        </method>
+        <method id="onTouchBegan" params="label"><![CDATA[
+            if((water_auto==0)&&(water_sts==0)){
+                label.skin = hiliteSkin;
+                water_sts = 1;
+                application.invoke( new MessageWithObject( "pins:/analogSensor/wateron" ));
+            }
+		]]></method>
         <method id="onTouchEnded" params="label">
             if(water_auto==0){
-            label.skin = button_water_Skin;
-            if(water_sts == 0){
-            this.WaterOn(label);  
-            }}
+                label.skin = button_water_Skin;
+                water_sts = 0;
+                application.invoke( new MessageWithObject( "pins:/analogSensor/wateroff" ));
+            }
         </method>
         <method id="WaterOn" params="label">
             label.interval = 2000;
             label.start(); 
-            label.string ="ON";
             water_sts = 1;
-            application.invoke( new MessageWithObject( "pins:/analogSensor/wateron"  ) );
-            
+            application.invoke( new MessageWithObject( "pins:/analogSensor/wateron" ));
         </method>
         <method id="WaterOff" params="label">
-            label.string ="OFF";
             water_sts = 0;
-            application.invoke( new MessageWithObject( "pins:/analogSensor/wateroff"  ) );
-            
+            application.invoke( new MessageWithObject( "pins:/analogSensor/wateroff" ));     
         </method>
 		<method id="onTimeChanged" params="label"><![CDATA[
 		    label.stop();   
             this.WaterOff(label);
 		]]></method>
         <method id="watergraySkinChanged" params="label">
-            label.skin =graySkin;
+            label.skin = graySkin;
         </method>
         <method id="waterSkinChanged" params="label">
-            label.skin =button_water_Skin;
+            label.skin = button_water_Skin;
         </method>
     </behavior>
     
@@ -454,7 +453,16 @@
             application.distribute( "waterSkinChanged");
             }
         </method>
-
+        <method id="waterautoChanged" params="label"><![CDATA[
+            if(water_auto==1){
+            label.string= "Auto";
+            application.distribute( "watergraySkinChanged");
+            }
+            else{
+                label.string= "Manual";
+                application.distribute( "waterSkinChanged");
+            }
+    	]]></method>
     </behavior>
     
     <behavior id="ButtonBehavior_led_auto">
@@ -481,6 +489,16 @@
             application.distribute( "ledSkinChanged");
             }
         </method>
+        <method id="ledautoChanged" params="label"><![CDATA[
+            if(led_auto==1){
+                label.string= "Auto";
+                application.distribute( "ledgraySkinChanged");
+            }
+            else{
+                label.string= "Manual";
+                application.distribute( "ledSkinChanged");
+            }
+        ]]></method>
     </behavior>
     
     <behavior id="ButtonBehavior_led">
@@ -501,23 +519,24 @@
         </method>
         <method id="onTouchEnded" params="label">
             if(led_auto==0){
-            label.skin = button_led_Skin_L;
-            if(led_sts==0){
-            led_sts=1;
-            this.LedOn(label);
+                label.skin = button_led_Skin_L;
+                if(led_sts==0){
+                    led_sts=1;
+                    this.LedOn(label);
+                }
+                else{
+                    led_sts=0;
+                    this.LedOff(label);
+                }
             }
-            else{
-            led_sts=0;
-            this.LedOff(label);
-            } }
         </method>
         <method id="LedOn" params="label">
-            label.string ="ON";
+        //    label.string ="ON";
             led_sts = 1;
             application.invoke( new MessageWithObject( "pins:/analogSensor/ledon"  ) );
         </method>
         <method id="LedOff" params="label">
-            label.string ="OFF";
+        //    label.string ="OFF";
             led_sts = 0;
             application.invoke( new MessageWithObject( "pins:/analogSensor/ledoff"  ) );
             
@@ -621,22 +640,12 @@
             </column>
         </line>
         <line left="0" right="0" height="80">
-            <label string="'water'">
+            <label string="'Water'">
                 <behavior like="ButtonBehavior_water">
                 </behavior>
             </label>
             <label string="'Auto'">
                 <behavior like="ButtonBehavior_water_auto">
-                    <method id="waterautoChanged" params="label"><![CDATA[
-                        if(water_auto==1){
-                   			 label.string= "Auto";
-                             application.distribute( "watergraySkinChanged");
-                        }
-                        else{
-                             label.string= "Manual";
-                             application.distribute( "waterSkinChanged");
-                        }
-    					 ]]></method>
                 </behavior>
             </label>
             <label string="'LED'">
@@ -645,16 +654,6 @@
             </label>
             <label string="'Auto'">
                 <behavior like="ButtonBehavior_led_auto">
-                    <method id="ledautoChanged" params="label"><![CDATA[
-                        if(led_auto==1){
-                   			 label.string= "Auto";
-                             application.distribute( "ledgraySkinChanged");
-                        }
-                        else{
-                             label.string= "Manual";
-                             application.distribute( "ledSkinChanged");
-                        }
-    					 ]]></method>
                 </behavior>
             </label>
         </line>
