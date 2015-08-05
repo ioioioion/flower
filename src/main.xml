@@ -651,7 +651,7 @@
         </line>
         <line left="0" right="0" height="80">
             <column top="0" left="0" bottom="0" right="0">
-                <label string="'Min:0 °C'">
+                <label string="'Min:10 °C'">
                     <behavior like="ButtonBehavior_mintemp_setting">
                         <method id="onTap" params="label">label.invoke(new Message("/temp_setting"));</method>
                         <method id="mintempChanged" params="label"><![CDATA[
@@ -659,7 +659,7 @@
     					 ]]></method>
                     </behavior>
                 </label>
-                <label string="'Max:0 °C'">
+                <label string="'Max:30 °C'">
                     <behavior like="ButtonBehavior_maxtemp_setting">
                         <method id="onTap" params="label">label.invoke(new Message("/temp_setting"));</method>
                         <method id="maxtempChanged" params="label"><![CDATA[
