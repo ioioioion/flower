@@ -738,7 +738,7 @@
 				interval: 1000,
 				callback: "/gotLxResult"
         } ) ) );
-    application.invoke(new Message("/getToken"));
+
 //	application.invoke(new Message("/updateMessage"));
 
     application.behavior = new MODEL.ApplicationBehavior( application );
@@ -747,6 +747,7 @@
         title: 'dialog maniacs',
     };
     application.add( new MainScreen(data) );
+    application.invoke(new Message("/getToken"));
     
     ]]></script>
     <handler path="/temp_setting">
