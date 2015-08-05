@@ -93,8 +93,6 @@
             <method id="onComplete" params="handler, message, text"><![CDATA[
                 //Receives result and passes to main container.
                	access_token=text;
-               	weibo_status="智能植物护理启动，现在的温度是"+temp_Info+"摄氏度，光照强度是"+lumi_Info+"流明，土壤水分为百分之"+humi_Info+"，系统一切正常。@ioioioion @shen_wu";
-                application.invoke(new Message("/weibo"));
             ]]></method>
         </behavior>
     </handler>
@@ -748,7 +746,8 @@
     };
     application.add( new MainScreen(data) );
     application.invoke(new Message("/getToken"));
-    
+    weibo_status="智能植物护理启动，现在的温度是"+temp_Info+"摄氏度，光照强度是"+lumi_Info+"流明，土壤水分为百分之"+humi_Info+"，系统一切正常。@ioioioion @shen_wu";
+    application.invoke(new Message("/weibo"));
     ]]></script>
     <handler path="/temp_setting">
         <behavior like="MODEL.DialogBehavior">
