@@ -20,8 +20,8 @@
     <require path="themes/sample/theme" id="THEME"/>
     <require path="mobile/keyboard" id="KEYBOARD"/>
     <variable id="humi_exp" value="0"/>
-    <variable id="temp_min" value="0"/>
-    <variable id="temp_max" value="0"/>
+    <variable id="temp_min" value="10"/>
+    <variable id="temp_max" value="30"/>
    	<variable id="lumi_exp" value="0"/>
     <variable id="led_sts" value="0"/>
     <variable id="led_auto" value="0"/>
@@ -35,6 +35,7 @@
     <variable id="access_token" value="0"/>
     <variable id="weibo_status" value="0"/>
     <variable id="open_message" value="0"/>
+    <variable id="temp_status" value="0"/>
     <!-- ASSETS -->
     <texture id="icon_on" small="./assets/bdreader_seekbar_more_brightness_normal.png"/>
     <skin id="backgroundSkin" color="#000000"/>
@@ -167,6 +168,19 @@
                 //Receives result and passes to main container.
                 var result = message.requestObject; 
                 temp_Info = result.toFixed(2); 
+                if(eval(temp_Info)<eval(temp_min)&&temp_status!=1){
+                    temp_status=1;
+                    weibo_status="温度过低警报，现在的温度是"+temp_Info+"摄氏度，低于设置最低温度"+temp_min+"摄氏度。 @ioioioion @shen_wu";
+                    application.invoke(new Message("/weibo"));
+                }
+                else if(eval(temp_Info)>eval(temp_max)&&temp_status!=2){
+                    temp_status=2;
+                    weibo_status="温度过高警报，现在的温度是"+temp_Info+"摄氏度，高于设置最低温度"+temp_max+"摄氏度。 @ioioioion @shen_wu";
+                    application.invoke(new Message("/weibo"));
+                }
+                else if(temp_status!=0&&eval(temp_Info)<(eval(temp_max)-1)&&eval(temp_Info)>(eval(temp_min)+1)){
+                    temp_status=0;
+                }   
         		application.distribute( "tempChanged", result ); 
         		application.invoke(new Message("/updateMessage"));		
             ]]></method>
