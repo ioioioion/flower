@@ -31,6 +31,7 @@
     <variable id="temp_Info" value="0"/>
     <variable id="lumi_Info" value="0"/>
     <variable id="humi_Info" value="0"/>
+    <variable id="last_humi_Info" value="0"/>
     <variable id="access_token" value="0"/>
     <variable id="weibo_status" value="0"/>
     
@@ -148,8 +149,9 @@
                 var result = message.requestObject;  
                 humi_Info = result.toFixed(2);
         		application.distribute( "wetChanged", result );    
-        		if(eval(result)<eval(humi_exp)&&!water_sts&&water_auto==1)
+        		if(eval(result)<eval(humi_exp)&&water_sts==0&&water_auto==1)
                 {
+                    last_humi_Info = humi_Info;
                     application.distribute( "WaterOn"); 
                 }     		
             ]]></method>
@@ -176,8 +178,12 @@
                 if(eval(result)<eval(lumi_exp)&&led_sts==0&&led_auto==1)
                 {
                     application.distribute( "LedOn"); 
+                    weibo_status="现在的光照强度是"+lumi_Info+"流明，光照强度过低，系统打开了补光灯为植物补光。@ioioioion @shen_wu";
+                    application.invoke(new Message("/weibo"));
                 } else if (eval(result)>eval(lumi_exp)+50&&led_auto==1){
                     application.distribute( "LedOff"); 
+                    weibo_status="现在的光照强度是"+lumi_Info+"流明，光照强度充足，系统关闭了植物补光灯。@ioioioion @shen_wu";
+                    application.invoke(new Message("/weibo"));
                 }
             ]]></method>
         </behavior>
@@ -437,8 +443,22 @@
             application.invoke( new MessageWithObject( "pins:/analogSensor/wateroff" ));     
         </method>
 		<method id="onTimeChanged" params="label"><![CDATA[
-		    label.stop();   
-            this.WaterOff(label);
+            if(water_sts == 1){
+                if( (eval(humi_Info)>eval(humi_exp)) || (water_auto==0) ){
+                    application.invoke( new MessageWithObject( "pins:/analogSensor/wateroff" ));
+                    water_sts = 0;
+                    label.stop();   
+                }
+                else{
+                    application.invoke( new MessageWithObject( "pins:/analogSensor/wateron" ));
+                    water_sts = 2;
+                }
+            }
+            else{
+                application.invoke( new MessageWithObject( "pins:/analogSensor/wateroff" ));
+                water_sts = 1;
+            }
+//            this.WaterOff(label);
 		]]></method>
         <method id="watergraySkinChanged" params="label">
             label.skin = graySkin;
@@ -525,17 +545,17 @@
         <method id="onCreate" params="label">
             label.coordinates = {top:1, bottom:1, left:1, right:1};
             if(led_auto==0)
-            label.skin = button_led_Skin_L;
+                label.skin = button_led_Skin_L;
             else
-            label.skin = graySkin;
+                label.skin = graySkin;
             label.style = inactiveStyle;
             label.active = true;
         </method>
         <method id="onTouchBegan" params="label">
             if(led_auto==0)
-            label.skin = hiliteSkin;
+                label.skin = hiliteSkin;
             else
-            label.skin = graySkin;
+                label.skin = graySkin;
         </method>
         <method id="onTouchEnded" params="label">
             if(led_auto==0){
