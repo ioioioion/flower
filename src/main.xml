@@ -34,7 +34,7 @@
     <variable id="last_humi_Info" value="0"/>
     <variable id="access_token" value="0"/>
     <variable id="weibo_status" value="0"/>
-    
+    <variable id="open_message" value="0"/>
     <!-- ASSETS -->
     <texture id="icon_on" small="./assets/bdreader_seekbar_more_brightness_normal.png"/>
     <skin id="backgroundSkin" color="#000000"/>
@@ -93,8 +93,6 @@
             <method id="onComplete" params="handler, message, text"><![CDATA[
                 //Receives result and passes to main container.
                	access_token=text;
-                weibo_status="智能植物护理启动，现在的温度是"+temp_Info+"摄氏度，光照强度是"+lumi_Info+"流明，土壤水分为百分之"+humi_Info+"，系统一切正常。@ioioioion @shen_wu";
-                application.invoke(new Message("/weibo"));
             ]]></method>
         </behavior>
     </handler>
@@ -113,31 +111,37 @@
             <method id="onComplete" params="handler, message, json"><![CDATA[
                 //Receives result and passes to main container.
                 if(json!=undefined){         
-                if(json.humi_auto!=null){
-                    water_auto=json.humi_auto;
-                    application.distribute( "waterautoChanged" );
+                    if(json.humi_auto!=null){
+                        water_auto=json.humi_auto;
+                        application.distribute( "waterautoChanged" );
+                    }
+                    if(json.lumi_auto!=null){
+                        led_auto=json.lumi_auto;                   
+                        application.distribute( "ledautoChanged" );
+                    }
+                    if(json.temp_min!=null){
+                        temp_min=json.temp_min;                   
+                        application.distribute( "mintempChanged" );
+                    }
+                    if(json.temp_max!=null){
+                        temp_max=json.temp_max;                   
+                        application.distribute( "maxtempChanged" );
+                    }
+                    if(json.humi_exp!=null){
+                        humi_exp=json.humi_exp;                   
+                        application.distribute( "humiChanged" );
+                    }
+                    if(json.lumi_exp!=null){
+                        lumi_exp=json.lumi_exp;                   
+                        application.distribute( "lumiChanged" );
+                    }                                               		 
                 }
-                if(json.lumi_auto!=null){
-                    led_auto=json.lumi_auto;                   
-                    application.distribute( "ledautoChanged" );
+                if(open_message==0&&temp_Info!=0&&lumi_Info!=0){
+                    open_message = 1;
+                    weibo_status="智能植物护理启动，现在的温度是"+temp_Info+"摄氏度，光照强度是"+lumi_Info+"流明，土壤水分为百分之"+humi_Info+"，系统一切正常。@ioioioion @shen_wu";
+                    application.invoke(new Message("/weibo"));
                 }
-                if(json.temp_min!=null){
-                    temp_min=json.temp_min;                   
-                    application.distribute( "mintempChanged" );
-                }
-                if(json.temp_max!=null){
-                    temp_max=json.temp_max;                   
-                    application.distribute( "maxtempChanged" );
-                }
-                if(json.humi_exp!=null){
-                    humi_exp=json.humi_exp;                   
-                    application.distribute( "humiChanged" );
-                }
-                if(json.lumi_exp!=null){
-                    lumi_exp=json.lumi_exp;                   
-                    application.distribute( "lumiChanged" );
-                }                                               		 
-              }
+                
             ]]></method>
         </behavior>
     </handler>
