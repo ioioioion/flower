@@ -78,7 +78,7 @@
 
 	<function id="wetread"><![CDATA[
 		var axes = this.pinsSimulator.delegate("getValue");
-		return axes.wetValue;				
+		return axes.wetValue*100;				
 	]]></function>
 	
 	<function id="tempread"><![CDATA[

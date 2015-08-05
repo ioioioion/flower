@@ -447,7 +447,9 @@
                 if( (eval(humi_Info)>eval(humi_exp)) || (water_auto==0) ){
                     application.invoke( new MessageWithObject( "pins:/analogSensor/wateroff" ));
                     water_sts = 0;
-                    label.stop();   
+                    label.stop(); 
+                    weibo_status="系统完成一次浇水，土壤湿度从百分之"+last_humi_Info+"上升到了百分之"+humi_Info+"。 @ioioioion @shen_wu";
+                    application.invoke(new Message("/weibo"));                     
                 }
                 else{
                     application.invoke( new MessageWithObject( "pins:/analogSensor/wateron" ));
