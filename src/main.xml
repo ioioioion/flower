@@ -724,7 +724,12 @@
                 }
             }
         } ) );
-
+    application.invoke( new MessageWithObject( "pins:/analogSensor/wetread?" + 
+            serializeQuery( {       
+				repeat: "on",
+				interval: 1000,
+				callback: "/gotWetResult"
+        } ) ) );	
     application.invoke( new MessageWithObject( "pins:/analogSensor/tempread?" + 
             serializeQuery( {       
 				repeat: "on",
@@ -737,12 +742,7 @@
 				interval: 1000,
 				callback: "/gotLxResult"
         } ) ) );
-    application.invoke( new MessageWithObject( "pins:/analogSensor/wetread?" + 
-            serializeQuery( {       
-				repeat: "on",
-				interval: 1000,
-				callback: "/gotWetResult"
-        } ) ) );	
+
 
 //	application.invoke(new Message("/updateMessage"));
 
