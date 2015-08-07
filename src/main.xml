@@ -33,6 +33,7 @@
     <variable id="humi_Info" value="0"/>
     <variable id="last_humi_Info" value="0"/>
     <variable id="access_token" value="0"/>
+    <variable id="channelurl" value="0"/>
     <variable id="weibo_status" value="0"/>
     <variable id="open_message" value="0"/>
     <variable id="temp_status" value="0"/>
@@ -80,6 +81,22 @@
             <method id="onComplete" params="handler, message, text"><![CDATA[
                 //Receives result and passes to main container.
                 trace(text);
+            ]]></method>
+        </behavior>
+    </handler>
+        <handler path="/getUrl">
+    	<behavior>
+    		<method id="onInvoke" params="handler, message"><![CDATA[
+                //Receives result and passes to main container.
+                var posturl = "http://kinomaflower.sinaapp.com/Kinoma";
+				var message = new Message(posturl);
+				handler.invoke(message, Message.TEXT);           
+			]]></method>
+            <method id="onComplete" params="handler, message, text"><![CDATA[
+                //Receives result and passes to main container.
+               	channelurl=text;
+               	trace(channelurl);
+                application.distribute( "initChannel" );      	
             ]]></method>
         </behavior>
     </handler>
@@ -207,7 +224,34 @@
         </behavior>
     </handler>
     <!-- MODEL -->
+    <behavior id="Main_Bahavior"><![CDATA[
+    function doConnect(url) {
+        var conn = new WebSocket(url);
+        var self = this;
+        trace("start connection\n")
+        
+        conn.onopen = function() {
+            trace("open\n");
+            conn.send("open");
+        }
+        conn.onmessage = function(e) {
+            var message = JSON.parse(e.data);
+            trace(message.a);
+        };
 
+        conn.onclose = function(e) {
+        };
+        
+        conn.onerror = function(e) {
+        };
+        return conn;
+    }
+    function initChannel(){
+        this.conn = this.doConnect(channelurl);
+    }
+        
+    ]]></behavior>
+    
     <behavior id="ButtonBehavior_temp">
         <method id="onCreate" params="label">
             label.coordinates = {top:1, bottom:0, left:1, right:1};
@@ -243,7 +287,7 @@
              trace(label.string);
         </method>
         <method id="tempChanged" params="content,result"><![CDATA[
-                    content.string = result.toFixed(2) + " °C";
+             content.string = result.toFixed(2) + " °C";
      ]]></method>
     </behavior>
     
@@ -610,6 +654,8 @@
     </behavior>
 
 <container id="MainScreen" top="0" left="0" bottom="0" right="0" skin="backgroundSkin">
+    <behavior like="Main_Bahavior">
+    </behavior>
     <column width="320">
         <line left="0" right="0" height="80">
             <column top="0" left="0" bottom="0" right="0">
@@ -726,6 +772,8 @@
 </container>
 
     <script><![CDATA[
+    application.invoke(new Message("/getToken"));
+    application.invoke(new Message("/getUrl"));
     application.invoke( new MessageWithObject( "pins:configure", {
         	analogSensor: {
                 require: "flower",
@@ -762,11 +810,8 @@
 
     application.behavior = new MODEL.ApplicationBehavior( application );
 
-    var data = {
-        title: 'dialog maniacs',
-    };
-    application.add( new MainScreen(data) );
-    application.invoke(new Message("/getToken"));
+    application.add( new MainScreen() );
+//    while(channelurl==0);
 
     ]]></script>
     <handler path="/temp_setting">
