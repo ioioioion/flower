@@ -239,8 +239,8 @@
             channel_init = 1;
         }
         conn.onmessage = function(e) {
-        //    var message = JSON.parse(e.data);
-            trace("getMessage");
+            var message = JSON.parse(e.data);
+            trace(message);
         };
 
         conn.onclose = function(e) {
