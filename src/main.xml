@@ -37,6 +37,8 @@
     <variable id="weibo_status" value="0"/>
     <variable id="open_message" value="0"/>
     <variable id="temp_status" value="0"/>
+    <variable id="channel_init" value="0"/>
+    
     <!-- ASSETS -->
     <texture id="icon_on" small="./assets/bdreader_seekbar_more_brightness_normal.png"/>
     <skin id="backgroundSkin" color="#000000"/>
@@ -199,7 +201,9 @@
                     temp_status=0;
                 }   
         		application.distribute( "tempChanged", result ); 
-        		application.invoke(new Message("/updateMessage"));		
+//        		application.invoke(new Message("/updateMessage"));
+
+        		application.distribute( "upload" ); 
             ]]></method>
         </behavior>
     </handler>
@@ -232,11 +236,11 @@
         
         conn.onopen = function() {
             trace("open\n");
-            conn.send("open");
+            channel_init = 1;
         }
         conn.onmessage = function(e) {
-            var message = JSON.parse(e.data);
-            trace(message.a);
+        //    var message = JSON.parse(e.data);
+            trace("getMessage");
         };
 
         conn.onclose = function(e) {
@@ -248,6 +252,16 @@
     }
     function initChannel(){
         this.conn = this.doConnect(channelurl);
+    }
+    function upload(){
+        if(channel_init==1){
+            var upload_data = new Object();
+            upload_data.temp_info = temp_Info;
+            upload_data.lumi_info = lumi_Info;
+            upload_data.humi_info = humi_Info;
+            var upload_message = JSON.stringify(upload_data);
+            this.conn.send(upload_message);
+        }
     }
         
     ]]></behavior>
