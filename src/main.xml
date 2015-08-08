@@ -24,8 +24,8 @@
     <variable id="temp_max" value="30"/>
    	<variable id="lumi_exp" value="0"/>
     <variable id="led_sts" value="0"/>
-    <variable id="led_auto" value="0"/>
-    <variable id="water_auto" value="0"/>
+    <variable id="lumi_auto" value="0"/>
+    <variable id="humi_auto" value="0"/>
     <variable id="water_sts" value="0"/>
     <variable id="water_manual" value="0"/>
     <variable id="temp_Info" value="0"/>
@@ -123,7 +123,7 @@
                 var saeurl = "http://xijincheng.vipsinaapp.com/kinoma";
 				var message_sae = new Message(saeurl);
 				message_sae.method = "POST";
-				message_sae.requestText = encodeURI("temp_Info="+temp_Info+"&humi_Info="+humi_Info+"&lumi_Info="+lumi_Info+"&Min_temp="+temp_min+"&Max_temp="+temp_max+"&Exp_humi="+humi_exp+"&Exp_lumi="+lumi_exp+"&lumi_auto="+led_auto+"&humi_auto="+water_auto);
+				message_sae.requestText = encodeURI("temp_Info="+temp_Info+"&humi_Info="+humi_Info+"&lumi_Info="+lumi_Info+"&Min_temp="+temp_min+"&Max_temp="+temp_max+"&Exp_humi="+humi_exp+"&Exp_lumi="+lumi_exp+"&lumi_auto="+lumi_auto+"&humi_auto="+humi_auto);
 				message_sae.setRequestHeader("Content-Length", message_sae.requestText.length);
 				message_sae.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 				handler.invoke(message_sae, Message.JSON);           
@@ -132,11 +132,11 @@
                 //Receives result and passes to main container.
                 if(json!=undefined){         
                     if(json.humi_auto!=null){
-                        water_auto=json.humi_auto;
+                        humi_auto=json.humi_auto;
                         application.distribute( "waterautoChanged" );
                     }
                     if(json.lumi_auto!=null){
-                        led_auto=json.lumi_auto;                   
+                        lumi_auto=json.lumi_auto;                   
                         application.distribute( "ledautoChanged" );
                     }
                     if(json.temp_min!=null){
@@ -173,7 +173,7 @@
                 var result = message.requestObject;  
                 humi_Info = result.toFixed(2);
         		application.distribute( "wetChanged", result );    
-        		if(eval(result)<eval(humi_exp)&&water_sts==0&&water_auto==1)
+        		if(eval(result)<eval(humi_exp)&&water_sts==0&&humi_auto==1)
                 {
                     last_humi_Info = humi_Info;
                     application.distribute( "WaterOn"); 
@@ -214,12 +214,12 @@
                 var result = message.requestObject;  
                 lumi_Info = result.toFixed(2);
         		application.distribute( "lxChanged", result ); 	
-                if(eval(result)<eval(lumi_exp)&&led_sts==0&&led_auto==1)
+                if(eval(result)<eval(lumi_exp)&&led_sts==0&&lumi_auto==1)
                 {
                     application.distribute( "LedOn"); 
                     weibo_status="现在的光照强度是"+lumi_Info+"流明，光照强度过低，系统打开了补光灯为植物补光。@ioioioion @shen_wu";
                     application.invoke(new Message("/weibo"));
-                } else if (eval(result)>eval(lumi_exp)+50&&led_auto==1){
+                } else if (eval(result)>eval(lumi_exp)+50&&lumi_auto==1){
                     application.distribute( "LedOff"); 
                     weibo_status="现在的光照强度是"+lumi_Info+"流明，光照强度充足，系统关闭了植物补光灯。@ioioioion @shen_wu";
                     application.invoke(new Message("/weibo"));
@@ -269,10 +269,10 @@
             var upload_setting = new Object();
             upload_setting.sort = "setting";
             upload_setting.temp_min = temp_min;
-            upload_setting.temp_min = temp_min;
+            upload_setting.temp_max = temp_max;
             upload_setting.lumi_exp = lumi_exp;
             upload_setting.humi_exp = humi_exp;
-            upload_setting.lumi_auto = led_auto;
+            upload_setting.lumi_auto = lumi_auto;
             upload_setting.humi_auto = humi_auto;
             var setting_message = JSON.stringify(upload_setting);
             this.conn.send(setting_message);
@@ -510,14 +510,14 @@
             label.active = true;
         </method>
         <method id="onTouchBegan" params="label"><![CDATA[
-            if((water_auto==0)&&(water_sts==0)){
+            if((humi_auto==0)&&(water_sts==0)){
                 label.skin = hiliteSkin;
                 water_sts = 1;
                 application.invoke( new MessageWithObject( "pins:/analogSensor/wateron" ));
             }
 		]]></method>
         <method id="onTouchEnded" params="label">
-            if(water_auto==0){
+            if(humi_auto==0){
                 label.skin = button_water_Skin;
                 water_sts = 0;
                 application.invoke( new MessageWithObject( "pins:/analogSensor/wateroff" ));
@@ -535,7 +535,7 @@
         </method>
 		<method id="onTimeChanged" params="label"><![CDATA[
             if(water_sts == 1){
-                if( (eval(humi_Info)>eval(humi_exp)) || (water_auto==0) ){
+                if( (eval(humi_Info)>eval(humi_exp)) || (humi_auto==0) ){
                     application.invoke( new MessageWithObject( "pins:/analogSensor/wateroff" ));
                     water_sts = 0;
                     label.stop(); 
@@ -562,7 +562,7 @@
     </behavior>
     
     
-   <behavior id="ButtonBehavior_water_auto">
+   <behavior id="ButtonBehavior_humi_auto">
         <method id="onCreate" params="label">
             label.coordinates = {top:1, bottom:1, left:1, right:1};
             label.skin = button_water_Skin_L;
@@ -575,19 +575,19 @@
         </method>
         <method id="onTouchEnded" params="label">
             label.skin = button_water_Skin_L;
-            if(water_auto==0){
-            water_auto=1;
+            if(humi_auto==0){
+            humi_auto=1;
             label.string = "Auto";
             application.distribute( "watergraySkinChanged");
             }
             else{
-            water_auto=0;
+            humi_auto=0;
             label.string = "Manual";
             application.distribute( "waterSkinChanged");
             }
         </method>
         <method id="waterautoChanged" params="label"><![CDATA[
-            if(water_auto==1){
+            if(humi_auto==1){
             label.string= "Auto";
             application.distribute( "watergraySkinChanged");
             }
@@ -598,7 +598,7 @@
     	]]></method>
     </behavior>
     
-    <behavior id="ButtonBehavior_led_auto">
+    <behavior id="ButtonBehavior_lumi_auto">
         <method id="onCreate" params="label">
             label.coordinates = {top:1, bottom:1, left:1, right:1};
             label.skin = button_led_Skin;
@@ -611,19 +611,19 @@
         </method>
         <method id="onTouchEnded" params="label">
             label.skin = button_led_Skin;
-            if(led_auto==0){
-            led_auto=1;
+            if(lumi_auto==0){
+            lumi_auto=1;
             label.string = "Auto";
             application.distribute( "ledgraySkinChanged");
             }
             else{
-            led_auto=0;
+            lumi_auto=0;
             label.string = "Manual";
             application.distribute( "ledSkinChanged");
             }
         </method>
         <method id="ledautoChanged" params="label"><![CDATA[
-            if(led_auto==1){
+            if(lumi_auto==1){
                 label.string= "Auto";
                 application.distribute( "ledgraySkinChanged");
             }
@@ -637,7 +637,7 @@
     <behavior id="ButtonBehavior_led">
         <method id="onCreate" params="label">
             label.coordinates = {top:1, bottom:1, left:1, right:1};
-            if(led_auto==0)
+            if(lumi_auto==0)
                 label.skin = button_led_Skin_L;
             else
                 label.skin = graySkin;
@@ -645,13 +645,13 @@
             label.active = true;
         </method>
         <method id="onTouchBegan" params="label">
-            if(led_auto==0)
+            if(lumi_auto==0)
                 label.skin = hiliteSkin;
             else
                 label.skin = graySkin;
         </method>
         <method id="onTouchEnded" params="label">
-            if(led_auto==0){
+            if(lumi_auto==0){
                 label.skin = button_led_Skin_L;
                 if(led_sts==0){
                     led_sts=1;
@@ -785,7 +785,7 @@
                 </behavior>
             </label>
             <label string="'Auto'">
-                <behavior like="ButtonBehavior_water_auto">
+                <behavior like="ButtonBehavior_humi_auto">
                 </behavior>
             </label>
             <label string="'LED'">
@@ -793,7 +793,7 @@
                 </behavior>
             </label>
             <label string="'Auto'">
-                <behavior like="ButtonBehavior_led_auto">
+                <behavior like="ButtonBehavior_lumi_auto">
                 </behavior>
             </label>
         </line>
@@ -936,10 +936,11 @@
                         temp_min = eval(query[key]).toFixed(0);
                     else 
                         temp_max = eval(query[key]).toFixed(0);
-                    application.distribute( "maxtempChanged", temp_max );
-                    application.distribute( "mintempChanged", temp_min );
                     trace(key + ": " + query[key] + "\n");
                 }
+                application.distribute( "maxtempChanged", temp_max );
+                application.distribute( "mintempChanged", temp_min );
+                application.distribute("upload_setting");
             </method>
         </behavior>
     </handler>
@@ -948,9 +949,11 @@
             <method id="onQuery" params="handler, query">
                 for (var key in query) {
                         humi_exp = eval(query[key]).toFixed(0);
-                    application.distribute( "humiChanged", humi_exp );
+                    
                     trace(key + ": " + query[key] + "\n");
                 }
+                application.distribute( "humiChanged", humi_exp );
+                application.distribute("upload_setting");
             </method>
         </behavior>
     </handler>
@@ -960,8 +963,10 @@
                 for (var key in query) {
                         lumi_exp = eval(query[key]).toFixed(0);
                     trace(key + ": " + query[key] + "\n");
-                    application.distribute( "lumiChanged", lumi_exp );
+                    
                 }
+                application.distribute( "lumiChanged", lumi_exp );
+                application.distribute("upload_setting");
             </method>
         </behavior>
     </handler>
