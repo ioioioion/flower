@@ -256,11 +256,26 @@
     function upload(){
         if(channel_init==1){
             var upload_data = new Object();
+            upload_data.sort = "status"
             upload_data.temp_info = temp_Info;
             upload_data.lumi_info = lumi_Info;
             upload_data.humi_info = humi_Info;
             var upload_message = JSON.stringify(upload_data);
             this.conn.send(upload_message);
+        }
+    }
+    function upload_setting(){
+        if(channel_init==1){
+            var upload_setting = new Object();
+            upload_setting.sort = "setting";
+            upload_setting.temp_min = temp_min;
+            upload_setting.temp_min = temp_min;
+            upload_setting.lumi_exp = lumi_exp;
+            upload_setting.humi_exp = humi_exp;
+            upload_setting.lumi_auto = led_auto;
+            upload_setting.humi_auto = humi_auto;
+            var setting_message = JSON.stringify(upload_setting);
+            this.conn.send(setting_message);
         }
     }
         
