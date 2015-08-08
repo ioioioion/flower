@@ -90,7 +90,7 @@
     	<behavior>
     		<method id="onInvoke" params="handler, message"><![CDATA[
                 //Receives result and passes to main container.
-                var posturl = "http://kinomaflower.sinaapp.com/Kinoma";
+                var posturl = "http://kinomaflower.vipsinaapp.com/Kinoma";
 				var message = new Message(posturl);
 				handler.invoke(message, Message.TEXT);           
 			]]></method>
