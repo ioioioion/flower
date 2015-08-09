@@ -44,17 +44,18 @@
     <skin id="backgroundSkin" color="#000000"/>
     <skin id="graySkin" color="#888888"/>
     <skin id="button_temp_Skin" color="#2B5797"/>
-    <skin id="button_wet_Skin" color="#1E7145"/>
-    <skin id="button_light_Skin" color="#FFC40D"/>
+    <skin id="button_humi_Skin" color="#1E7145"/>
+    <skin id="button_lumi_Skin" color="#FFC40D"/>
 
-    <skin id="button_temp_Skin_L" color="#603CBA"/>
-    <skin id="button_wet_Skin_L" color="#252525"/>
-    <skin id="button_light_Skin_L" color="#00ABA9"/>
+    <skin id="button_maxtemp_Skin" color="#603CBA"/>
+    <skin id="button_humi_exp_Skin" color="#252525"/>
+    <skin id="button_lumi_auto_Skin" color="#00ABA9"/>
     <skin id="button_water_Skin" color="#56C5ff"/>
-    <skin id="button_water_Skin_L" color="#DA532C"/>
-    <skin id="button_led_Skin" color="#EE1111"/>
+    <skin id="button_water_auto_Skin" color="#DA532C"/>
+    <skin id="button_lumi_exp_Skin" color="#EE1111"/>
 
-    <skin id="button_led_Skin_L" color="#91d100"/>
+    <skin id="button_light_Skin" color="#00c13f"/>
+    
     <skin id="hiliteSkin" color="#333333"/>
     <skin id="dummuSkin" color="red"/>
     <style id="inactiveStyle" font="bold 24px" color="#CCCCCC" align="center,middle"/>
@@ -97,7 +98,6 @@
             <method id="onComplete" params="handler, message, text"><![CDATA[
                 //Receives result and passes to main container.
                	channelurl=text;
-               	trace(channelurl);
                 application.distribute( "initChannel" );      	
             ]]></method>
         </behavior>
@@ -116,72 +116,23 @@
             ]]></method>
         </behavior>
     </handler>
-    <handler path="/updateMessage">
-    	<behavior>
-    		<method id="onInvoke" params="handler, message"><![CDATA[
-                //Receives result and passes to main container.
-                var saeurl = "http://xijincheng.vipsinaapp.com/kinoma";
-				var message_sae = new Message(saeurl);
-				message_sae.method = "POST";
-				message_sae.requestText = encodeURI("temp_Info="+temp_Info+"&humi_Info="+humi_Info+"&lumi_Info="+lumi_Info+"&Min_temp="+temp_min+"&Max_temp="+temp_max+"&Exp_humi="+humi_exp+"&Exp_lumi="+lumi_exp+"&lumi_auto="+lumi_auto+"&humi_auto="+humi_auto);
-				message_sae.setRequestHeader("Content-Length", message_sae.requestText.length);
-				message_sae.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-				handler.invoke(message_sae, Message.JSON);           
-			]]></method>
-            <method id="onComplete" params="handler, message, json"><![CDATA[
-                //Receives result and passes to main container.
-                if(json!=undefined){         
-                    if(json.humi_auto!=null){
-                        humi_auto=json.humi_auto;
-                        application.distribute( "waterautoChanged" );
-                    }
-                    if(json.lumi_auto!=null){
-                        lumi_auto=json.lumi_auto;                   
-                        application.distribute( "ledautoChanged" );
-                    }
-                    if(json.temp_min!=null){
-                        temp_min=json.temp_min;                   
-                        application.distribute( "mintempChanged" );
-                    }
-                    if(json.temp_max!=null){
-                        temp_max=json.temp_max;                   
-                        application.distribute( "maxtempChanged" );
-                    }
-                    if(json.humi_exp!=null){
-                        humi_exp=json.humi_exp;                   
-                        application.distribute( "humiChanged" );
-                    }
-                    if(json.lumi_exp!=null){
-                        lumi_exp=json.lumi_exp;                   
-                        application.distribute( "lumiChanged" );
-                    }                                               		 
-                }
-                if(open_message==0&&temp_Info!=0&&lumi_Info!=0){
-                    open_message = 1;
-                    weibo_status="智能植物护理启动，现在的温度是"+temp_Info+"摄氏度，光照强度是"+lumi_Info+"流明，土壤水分为百分之"+humi_Info+"，系统一切正常。@ioioioion @shen_wu";
-                    application.invoke(new Message("/weibo"));
-                }
-                
-            ]]></method>
-        </behavior>
-    </handler>
-    
-    <handler path="/gotWetResult">
+
+    <handler path="/get_humi_Result">
     	<behavior>
     		<method id="onInvoke" params="handler, message"><![CDATA[
                 //Receives result and passes to main container.
                 var result = message.requestObject;  
                 humi_Info = result.toFixed(2);
-        		application.distribute( "wetChanged", result );    
+        		application.distribute( "humi_Changed", result );    
         		if(eval(result)<eval(humi_exp)&&water_sts==0&&humi_auto==1)
                 {
                     last_humi_Info = humi_Info;
-                    application.distribute( "WaterOn"); 
+                    application.distribute( "Auto_WaterOn"); 
                 }     		
             ]]></method>
         </behavior>
     </handler>
-    <handler path="/gotTempResult">
+    <handler path="/get_temp_Result">
     	<behavior>
     		<method id="onInvoke" params="handler, message"><![CDATA[
                 //Receives result and passes to main container.
@@ -189,40 +140,46 @@
                 temp_Info = result.toFixed(2); 
                 if(eval(temp_Info)<eval(temp_min)&&temp_status!=1){
                     temp_status=1;
-                    weibo_status="温度过低警报，现在的温度是"+temp_Info+"摄氏度，低于设置最低温度"+temp_min+"摄氏度。 @ioioioion @shen_wu";
-                    application.invoke(new Message("/weibo"));
+                    weibo_status="温度过低警报，现在的温度是"+temp_Info+"摄氏度，低于设置的最低温度"+temp_min+"摄氏度。 @ioioioion @shen_wu";
+                    if(open_message==1){                
+                    	application.invoke(new Message("/weibo"));
+                   	}
                 }
                 else if(eval(temp_Info)>eval(temp_max)&&temp_status!=2){
                     temp_status=2;
-                    weibo_status="温度过高警报，现在的温度是"+temp_Info+"摄氏度，高于设置最低温度"+temp_max+"摄氏度。 @ioioioion @shen_wu";
-                    application.invoke(new Message("/weibo"));
+                    weibo_status="温度过高警报，现在的温度是"+temp_Info+"摄氏度，高于设置的最高温度"+temp_max+"摄氏度。 @ioioioion @shen_wu";
+                    if(open_message==1){                
+                    	application.invoke(new Message("/weibo"));
+                   	}
                 }
                 else if(temp_status!=0&&eval(temp_Info)<(eval(temp_max)-1)&&eval(temp_Info)>(eval(temp_min)+1)){
                     temp_status=0;
                 }   
         		application.distribute( "tempChanged", result ); 
-//        		application.invoke(new Message("/updateMessage"));
-
         		application.distribute( "upload" ); 
             ]]></method>
         </behavior>
     </handler>
-    <handler path="/gotLxResult">
+    <handler path="/get_lumi_Result">
     	<behavior>
     		<method id="onInvoke" params="handler, message"><![CDATA[
                 //Receives result and passes to main container.
                 var result = message.requestObject;  
                 lumi_Info = result.toFixed(2);
-        		application.distribute( "lxChanged", result ); 	
+        		application.distribute( "lumiChanged", result ); 	
                 if(eval(result)<eval(lumi_exp)&&led_sts==0&&lumi_auto==1)
                 {
                     application.distribute( "LedOn"); 
                     weibo_status="现在的光照强度是"+lumi_Info+"流明，光照强度过低，系统打开了补光灯为植物补光。@ioioioion @shen_wu";
-                    application.invoke(new Message("/weibo"));
-                } else if (eval(result)>eval(lumi_exp)+50&&lumi_auto==1){
+                    if(open_message==1){                
+                    	application.invoke(new Message("/weibo"));
+                   	}
+                } else if (eval(result)>eval(lumi_exp)+50&&lumi_auto==1&&led_sts==1){
                     application.distribute( "LedOff"); 
                     weibo_status="现在的光照强度是"+lumi_Info+"流明，光照强度充足，系统关闭了植物补光灯。@ioioioion @shen_wu";
-                    application.invoke(new Message("/weibo"));
+                    if(open_message==1){                
+                    	application.invoke(new Message("/weibo"));
+                   	}
                 }
             ]]></method>
         </behavior>
@@ -240,7 +197,20 @@
         }
         conn.onmessage = function(e) {
             var message = JSON.parse(e.data);
-            trace(message);
+            if(message.sort == "setting"){
+            	temp_min = message.temp_min;
+            	application.distribute( "mintempChanged");
+            	temp_max = message.temp_max;
+            	application.distribute( "maxtempChanged");
+            	lumi_exp = message.lumi_exp;
+            	application.distribute( "lumi_exp_Changed");
+            	humi_exp = message.humi_exp;
+            	application.distribute( "humi_exp_Changed");
+            	lumi_auto = message.lumi_auto;
+            	application.distribute( "lumi_autoChanged");
+            	humi_auto = message.humi_auto;
+            	application.distribute( "humi_autoChanged");
+            }
         };
 
         conn.onclose = function(e) {
@@ -262,6 +232,12 @@
             upload_data.humi_info = humi_Info;
             var upload_message = JSON.stringify(upload_data);
             this.conn.send(upload_message);
+            if(open_message==0&&temp_Info!=0&&lumi_Info!=0&&access_token!=0){
+            	open_message = 1;
+                weibo_status="智能植物护理启动，现在的温度是"+temp_Info+"摄氏度，光照强度是"+lumi_Info+"流明，土壤水分为百分之"+humi_Info+"，系统一切正常。@ioioioion @shen_wu";
+                application.invoke(new Message("/weibo"));
+            }
+            
         }
     }
     function upload_setting(){
@@ -299,7 +275,7 @@
         </method>
     </behavior>
     
-        <behavior id="ButtonBehavior_temp_num">
+    <behavior id="ButtonBehavior_temp_num">
         <method id="onCreate" params="label">
             label.coordinates = {top:0, bottom:1, left:1, right:1};
             label.skin = button_temp_Skin;
@@ -320,57 +296,57 @@
      ]]></method>
     </behavior>
     
-    <behavior id="ButtonBehavior_wet">
+    <behavior id="ButtonBehavior_humi">
         <method id="onCreate" params="label">
             label.coordinates = {top:1, bottom:0, left:1, right:1};
-            label.skin = button_wet_Skin;
+            label.skin = button_humi_Skin;
             label.style = labelStyle;
             label.active = true;
         </method>
         <method id="onTouchBegan" params="label">
         </method>
         <method id="onTouchEnded" params="label">
-            label.skin = button_wet_Skin;
+            label.skin = button_humi_Skin;
             this.onTap(label);
         </method>
         <method id="onTap" params="label">
              trace(label.string);
         </method>
     </behavior>
-    <behavior id="ButtonBehavior_wet_num">
+    <behavior id="ButtonBehavior_humi_num">
         <method id="onCreate" params="label">
             label.coordinates = {top:0, bottom:1, left:1, right:1};
-            label.skin = button_wet_Skin;
+            label.skin = button_humi_Skin;
             label.style = numStyle;
             label.active = true;
         </method>
         <method id="onTouchBegan" params="label">
         </method>
         <method id="onTouchEnded" params="label">
-            label.skin = button_wet_Skin;
+            label.skin = button_humi_Skin;
             this.onTap(label);
         </method>
         <method id="onTap" params="label">
              trace(label.string);
         </method>
-        <method id="wetChanged" params="content,result"><![CDATA[
+        <method id="humi_Changed" params="content,result"><![CDATA[
             		//Converts voltage result to temperature. 
                     var temp = result;
                     content.string = temp.toFixed(2) + " %";
      ]]></method>
     </behavior>
     
-    <behavior id="ButtonBehavior_light">
+    <behavior id="ButtonBehavior_lumi">
         <method id="onCreate" params="label">
             label.coordinates = {top:1, bottom:0, left:1, right:1};
-            label.skin = button_light_Skin;
+            label.skin = button_lumi_Skin;
             label.style = labelStyle;
             label.active = true;
         </method>
         <method id="onTouchBegan" params="label">
         </method>
         <method id="onTouchEnded" params="label">
-            label.skin = button_light_Skin;
+            label.skin = button_lumi_Skin;
             this.onTap(label);
         </method>
         <method id="onTap" params="label">
@@ -378,23 +354,23 @@
         </method>
     </behavior>
     
-    <behavior id="ButtonBehavior_light_num">
+    <behavior id="ButtonBehavior_lumi_num">
         <method id="onCreate" params="label">
             label.coordinates = {top:0, bottom:1, left:1, right:1};
-            label.skin = button_light_Skin;
+            label.skin = button_lumi_Skin;
             label.style = numStyle;
             label.active = true;
         </method>
         <method id="onTouchBegan" params="label">
         </method>
         <method id="onTouchEnded" params="label">
-            label.skin = button_light_Skin;
+            label.skin = button_lumi_Skin;
             this.onTap(label);
         </method>
         <method id="onTap" params="label">
              trace(label.string);
         </method>
-        <method id="lxChanged" params="content,result"><![CDATA[
+        <method id="lumiChanged" params="content,result"><![CDATA[
                     content.string = result.toFixed(2) + " lx";
      ]]></method>
     </behavior>
@@ -402,14 +378,14 @@
     <behavior id="ButtonBehavior_maxtemp_setting">
         <method id="onCreate" params="label">
             label.coordinates = {top:0, bottom:1, left:1, right:1};
-            label.skin = button_temp_Skin_L;
+            label.skin = button_maxtemp_Skin;
             label.style = t_smalllabelStyle;
             label.active = true;
         </method>
         <method id="onTouchBegan" params="label">
         </method>
         <method id="onTouchEnded" params="label">
-            label.skin = button_temp_Skin_L;
+            label.skin = button_maxtemp_Skin;
             this.onTap(label);
         </method>
         <method id="onTap" params="label">
@@ -419,82 +395,82 @@
     <behavior id="ButtonBehavior_mintemp_setting">
         <method id="onCreate" params="label">
             label.coordinates = {top:1, bottom:0, left:1, right:1};
-            label.skin = button_temp_Skin_L;
+            label.skin = button_maxtemp_Skin;
             label.style = b_smalllabelStyle;
             label.active = true;
         </method>
         <method id="onTouchBegan" params="label">
         </method>
         <method id="onTouchEnded" params="label">
-            label.skin = button_temp_Skin_L;
+            label.skin = button_maxtemp_Skin;
             this.onTap(label);
         </method>
         <method id="onTap" params="label">
              trace(label.string);
         </method>
     </behavior>
-    <behavior id="ButtonBehavior_expwet_num_setting">
+    <behavior id="ButtonBehavior_exp_humi_num_setting">
         <method id="onCreate" params="label">
             label.coordinates = {top:0, bottom:1, left:1, right:1};
-            label.skin = button_wet_Skin_L;
+            label.skin = button_humi_exp_Skin;
             label.style = t_smalllabelStyle;
             label.active = true;
         </method>
         <method id="onTouchBegan" params="label">
         </method>
         <method id="onTouchEnded" params="label">
-            label.skin = button_wet_Skin_L;
+            label.skin = button_humi_exp_Skin;
             this.onTap(label);
         </method>
         <method id="onTap" params="label">
              trace(label.string);
         </method>
     </behavior>
-    <behavior id="ButtonBehavior_expwet_setting">
+    <behavior id="ButtonBehavior_exp_humi_setting">
         <method id="onCreate" params="label">
             label.coordinates = {top:1, bottom:0, left:1, right:1};
-            label.skin = button_wet_Skin_L;
+            label.skin = button_humi_exp_Skin;
             label.style = b_smalllabelStyle;
             label.active = true;
         </method>
         <method id="onTouchBegan" params="label">
         </method>
         <method id="onTouchEnded" params="label">
-            label.skin = button_wet_Skin_L;
+            label.skin = button_humi_exp_Skin;
             this.onTap(label);
         </method>
         <method id="onTap" params="label">
              trace(label.string);
         </method>
     </behavior>
-    <behavior id="ButtonBehavior_explig_num_setting">
+    <behavior id="ButtonBehavior_exp_lumi_num_setting">
         <method id="onCreate" params="label">
             label.coordinates = {top:0, bottom:1, left:1, right:1};
-            label.skin = button_light_Skin_L;
+            label.skin = button_lumi_exp_Skin;
             label.style = t_smalllabelStyle;
             label.active = true;
         </method>
         <method id="onTouchBegan" params="label">
         </method>
         <method id="onTouchEnded" params="label">
-            label.skin = button_light_Skin_L;
+            label.skin = button_lumi_exp_Skin;
             this.onTap(label);
         </method>
         <method id="onTap" params="label">
              trace(label.string);
         </method>
     </behavior>
-    <behavior id="ButtonBehavior_explig_setting">
+    <behavior id="ButtonBehavior_exp_lumi_setting">
         <method id="onCreate" params="label">
             label.coordinates = {top:1, bottom:0, left:1, right:1};
-            label.skin = button_light_Skin_L;
+            label.skin = button_lumi_exp_Skin;
             label.style = b_smalllabelStyle;
             label.active = true;
         </method>
         <method id="onTouchBegan" params="label">
         </method>
         <method id="onTouchEnded" params="label">
-            label.skin = button_light_Skin_L;
+            label.skin = button_lumi_exp_Skin;
             this.onTap(label);
         </method>
         <method id="onTap" params="label">
@@ -523,15 +499,11 @@
                 application.invoke( new MessageWithObject( "pins:/analogSensor/wateroff" ));
             }
         </method>
-        <method id="WaterOn" params="label">
+        <method id="Auto_WaterOn" params="label">
             label.interval = 2000;
             label.start(); 
             water_sts = 1;
             application.invoke( new MessageWithObject( "pins:/analogSensor/wateron" ));
-        </method>
-        <method id="WaterOff" params="label">
-            water_sts = 0;
-            application.invoke( new MessageWithObject( "pins:/analogSensor/wateroff" ));     
         </method>
 		<method id="onTimeChanged" params="label"><![CDATA[
             if(water_sts == 1){
@@ -540,7 +512,9 @@
                     water_sts = 0;
                     label.stop(); 
                     weibo_status="系统完成一次浇水，土壤湿度从百分之"+last_humi_Info+"上升到了百分之"+humi_Info+"。 @ioioioion @shen_wu";
-                    application.invoke(new Message("/weibo"));                     
+                    if(open_message == 1){
+                    	application.invoke(new Message("/weibo"));
+                    }                     
                 }
                 else{
                     application.invoke( new MessageWithObject( "pins:/analogSensor/wateron" ));
@@ -551,7 +525,6 @@
                 application.invoke( new MessageWithObject( "pins:/analogSensor/wateroff" ));
                 water_sts = 1;
             }
-//            this.WaterOff(label);
 		]]></method>
         <method id="watergraySkinChanged" params="label">
             label.skin = graySkin;
@@ -562,10 +535,10 @@
     </behavior>
     
     
-   <behavior id="ButtonBehavior_humi_auto">
+   <behavior id="ButtonBehavior_water_auto">
         <method id="onCreate" params="label">
             label.coordinates = {top:1, bottom:1, left:1, right:1};
-            label.skin = button_water_Skin_L;
+            label.skin = button_water_auto_Skin;
             label.style = biglabelStyle;
             label.active = true;
             label.string = "Manual";
@@ -574,22 +547,23 @@
             label.skin = hiliteSkin;
         </method>
         <method id="onTouchEnded" params="label">
-            label.skin = button_water_Skin_L;
+            label.skin = button_water_auto_Skin;
             if(humi_auto==0){
-            humi_auto=1;
-            label.string = "Auto";
-            application.distribute( "watergraySkinChanged");
+            	humi_auto=1;
+            	label.string = "Auto";
+            	application.distribute( "watergraySkinChanged");
             }
             else{
-            humi_auto=0;
-            label.string = "Manual";
-            application.distribute( "waterSkinChanged");
+           		humi_auto=0;
+            	label.string = "Manual";
+            	application.distribute( "waterSkinChanged");
             }
+            application.distribute( "upload_setting");
         </method>
-        <method id="waterautoChanged" params="label"><![CDATA[
+        <method id="humi_autoChanged" params="label"><![CDATA[
             if(humi_auto==1){
-            label.string= "Auto";
-            application.distribute( "watergraySkinChanged");
+            	label.string= "Auto";
+            	application.distribute( "watergraySkinChanged");
             }
             else{
                 label.string= "Manual";
@@ -601,7 +575,7 @@
     <behavior id="ButtonBehavior_lumi_auto">
         <method id="onCreate" params="label">
             label.coordinates = {top:1, bottom:1, left:1, right:1};
-            label.skin = button_led_Skin;
+            label.skin = button_lumi_auto_Skin;
             label.style = biglabelStyle;
             label.active = true;
             label.string = "Manual";
@@ -610,19 +584,23 @@
             label.skin = hiliteSkin;
         </method>
         <method id="onTouchEnded" params="label">
-            label.skin = button_led_Skin;
+            label.skin = button_lumi_auto_Skin;
             if(lumi_auto==0){
-            lumi_auto=1;
-            label.string = "Auto";
-            application.distribute( "ledgraySkinChanged");
+            	lumi_auto=1;
+            	label.string = "Auto";
+            	application.distribute( "ledgraySkinChanged");
             }
             else{
-            lumi_auto=0;
-            label.string = "Manual";
-            application.distribute( "ledSkinChanged");
+            	lumi_auto=0;
+            	label.string = "Manual";
+            	application.distribute( "ledSkinChanged");
+            	if(led_sts == 1){
+                	application.distribute( "LedOff");
+                }
             }
+            application.distribute( "upload_setting");
         </method>
-        <method id="ledautoChanged" params="label"><![CDATA[
+        <method id="lumi_autoChanged" params="label"><![CDATA[
             if(lumi_auto==1){
                 label.string= "Auto";
                 application.distribute( "ledgraySkinChanged");
@@ -630,15 +608,18 @@
             else{
                 label.string= "Manual";
                 application.distribute( "ledSkinChanged");
+                if(led_sts == 1){
+                	application.distribute( "LedOff");
+                }
             }
         ]]></method>
     </behavior>
     
-    <behavior id="ButtonBehavior_led">
+    <behavior id="ButtonBehavior_light">
         <method id="onCreate" params="label">
             label.coordinates = {top:1, bottom:1, left:1, right:1};
             if(lumi_auto==0)
-                label.skin = button_led_Skin_L;
+                label.skin = button_light_Skin;
             else
                 label.skin = graySkin;
             label.style = inactiveStyle;
@@ -652,7 +633,7 @@
         </method>
         <method id="onTouchEnded" params="label">
             if(lumi_auto==0){
-                label.skin = button_led_Skin_L;
+                label.skin = button_light_Skin;
                 if(led_sts==0){
                     led_sts=1;
                     this.LedOn(label);
@@ -678,7 +659,7 @@
             label.skin =graySkin;
         </method>
         <method id="ledSkinChanged" params="label">
-            label.skin =button_led_Skin_L;
+            label.skin =button_light_Skin;
         </method>
     </behavior>
 
@@ -701,24 +682,24 @@
             </column>
             <column top="0" left="0" bottom="0" right="0">
                 <label string="'Soil Humidity'">
-                    <behavior like="ButtonBehavior_wet">
+                    <behavior like="ButtonBehavior_humi">
 
                     </behavior>
                 </label>
                 <label string="'0 %'">
-                    <behavior like="ButtonBehavior_wet_num">
+                    <behavior like="ButtonBehavior_humi_num">
 
                     </behavior>
                 </label>
             </column>
             <column top="0" left="0" bottom="0" right="0">
                 <label string="'Luminance'">
-                    <behavior like="ButtonBehavior_light">
+                    <behavior like="ButtonBehavior_lumi">
 
                     </behavior>
                 </label>
                 <label string="'0 lx'">
-                    <behavior like="ButtonBehavior_light_num">
+                    <behavior like="ButtonBehavior_lumi_num">
 
                     </behavior>
                 </label>
@@ -745,14 +726,14 @@
             </column>
             <column top="0" left="0" bottom="0" right="0">
                 <label string="'Expected:'">
-                    <behavior like="ButtonBehavior_expwet_setting">
+                    <behavior like="ButtonBehavior_exp_humi_setting">
                         <method id="onTap" params="label">label.invoke(new Message("/water_setting"));</method>
                     </behavior>
                 </label>
                 <label string="'0 %'">
-                    <behavior like="ButtonBehavior_expwet_num_setting">
+                    <behavior like="ButtonBehavior_exp_humi_num_setting">
                         <method id="onTap" params="label">label.invoke(new Message("/water_setting"));</method>
-                        <method id="humiChanged" params="label"><![CDATA[
+                        <method id="humi_exp_Changed" params="label"><![CDATA[
                    			 label.string= humi_exp + " %";
     					 ]]></method>
                     </behavior>
@@ -760,14 +741,14 @@
             </column>
             <column top="0" left="0" bottom="0" right="0">
                 <label string="'Expected:'">
-                    <behavior like="ButtonBehavior_explig_setting">
+                    <behavior like="ButtonBehavior_exp_lumi_setting">
                         <method id="onTap" params="label">label.invoke(new Message("/light_setting"));</method>
                     </behavior>
                 </label>
                 <label string="'0 lx'">
-                    <behavior like="ButtonBehavior_explig_num_setting">
+                    <behavior like="ButtonBehavior_exp_lumi_num_setting">
                         <method id="onTap" params="label">label.invoke(new Message("/light_setting"));</method>
-                        <method id="lumiChanged" params="label"><![CDATA[
+                        <method id="lumi_exp_Changed" params="label"><![CDATA[
                    			 label.string= lumi_exp + " lx";
     					 ]]></method>
                     </behavior>
@@ -785,11 +766,11 @@
                 </behavior>
             </label>
             <label string="'Auto'">
-                <behavior like="ButtonBehavior_humi_auto">
+                <behavior like="ButtonBehavior_water_auto">
                 </behavior>
             </label>
-            <label string="'LED'">
-                <behavior like="ButtonBehavior_led">
+            <label string="'Light'">
+                <behavior like="ButtonBehavior_light">
                 </behavior>
             </label>
             <label string="'Auto'">
@@ -819,28 +800,23 @@
             serializeQuery( {       
 				repeat: "on",
 				interval: 1000,
-				callback: "/gotWetResult"
+				callback: "/get_humi_Result"
         } ) ) );	
     application.invoke( new MessageWithObject( "pins:/analogSensor/tempread?" + 
             serializeQuery( {       
 				repeat: "on",
 				interval: 1000,
-				callback: "/gotTempResult"
+				callback: "/get_temp_Result"
         } ) ) );
     application.invoke( new MessageWithObject( "pins:/analogSensor/lightread?" + 
             serializeQuery( {       
 				repeat: "on",
 				interval: 1000,
-				callback: "/gotLxResult"
+				callback: "/get_lumi_Result"
         } ) ) );
-
-
-//	application.invoke(new Message("/updateMessage"));
-
     application.behavior = new MODEL.ApplicationBehavior( application );
 
     application.add( new MainScreen() );
-//    while(channelurl==0);
 
     ]]></script>
     <handler path="/temp_setting">
@@ -938,12 +914,34 @@
                         temp_max = eval(query[key]).toFixed(0);
                     trace(key + ": " + query[key] + "\n");
                 }
-                application.distribute( "maxtempChanged", temp_max );
-                application.distribute( "mintempChanged", temp_min );
-                application.distribute("upload_setting");
+                if(temp_max-temp_min>1){
+                	application.distribute( "maxtempChanged", temp_max );
+                	application.distribute( "mintempChanged", temp_min );
+                	application.distribute("upload_setting");
+                }
+                else{
+                    handler.invoke(new Message("/error_setting"));
+                }
             </method>
         </behavior>
     </handler>
+    <handler path="/error_setting">
+        <behavior like="MODEL.DialogBehavior">
+             <method id="onDescribe" params="query">
+                return {
+                    Dialog: DIALOG.Box,
+                    title: "Error",
+                    items: [
+                        {
+                            Item: DIALOG.Caption,
+                            string: "Inappropriate Temperature Setting",
+                        },
+                    ],
+                    ok: "OK",
+                };
+            </method>
+        </behavior>
+    </handler>    
     <handler path="/water_set">
         <behavior like="MODEL.CommandBehavior">
             <method id="onQuery" params="handler, query">
@@ -952,7 +950,7 @@
                     
                     trace(key + ": " + query[key] + "\n");
                 }
-                application.distribute( "humiChanged", humi_exp );
+                application.distribute( "humi_exp_Changed", humi_exp );
                 application.distribute("upload_setting");
             </method>
         </behavior>
@@ -965,7 +963,7 @@
                     trace(key + ": " + query[key] + "\n");
                     
                 }
-                application.distribute( "lumiChanged", lumi_exp );
+                application.distribute( "lumi_exp_Changed", lumi_exp );
                 application.distribute("upload_setting");
             </method>
         </behavior>
