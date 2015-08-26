@@ -64,10 +64,12 @@
     <style id="headerStyle" font="bold 16px" color="#444" align="center,bottom"/>
     <style id="buttonStyle" font="bold 16px" color="white" align="center,middle"/>
     <style id="labelStyle" font="bold 16px" color="white" align="center,bottom"/>
+    <style id="RedStyle" font="bold 16px" color="red" align="center,bottom"/>
     <style id="b_smalllabelStyle" font="bold 20px" color="white" align="center,bottom"/>
     <style id="t_smalllabelStyle" font="bold 20px" color="white" align="center,top"/>
     <style id="biglabelStyle" font="bold 24px" color="white" align="center,middle"/>
     <style id="numStyle" font="bold 26px" color="white" align="center,top"/>
+    <style id="RednumStyle" font="bold 26px" color="red" align="center,top"/>
     
     <handler path="/weibo">
     	<behavior>
@@ -140,6 +142,7 @@
                 temp_Info = result.toFixed(2); 
                 if(eval(temp_Info)<eval(temp_min)&&temp_status!=1){
                     temp_status=1;
+                    application.distribute( "temp_abnormal" ); 
                     weibo_status="温度过低警报，现在的温度是"+temp_Info+"摄氏度，低于设置的最低温度"+temp_min+"摄氏度。 @ioioioion @shen_wu";
                     if(open_message==1){                
                     	application.invoke(new Message("/weibo"));
@@ -147,6 +150,7 @@
                 }
                 else if(eval(temp_Info)>eval(temp_max)&&temp_status!=2){
                     temp_status=2;
+                    application.distribute( "temp_abnormal" ); 
                     weibo_status="温度过高警报，现在的温度是"+temp_Info+"摄氏度，高于设置的最高温度"+temp_max+"摄氏度。 @ioioioion @shen_wu";
                     if(open_message==1){                
                     	application.invoke(new Message("/weibo"));
@@ -154,6 +158,7 @@
                 }
                 else if(temp_status!=0&&eval(temp_Info)<(eval(temp_max)-1)&&eval(temp_Info)>(eval(temp_min)+1)){
                     temp_status=0;
+                    application.distribute( "temp_normal" );
                 }   
         		application.distribute( "tempChanged", result ); 
         		application.distribute( "upload" ); 
@@ -234,7 +239,7 @@
             this.conn.send(upload_message);
             if(open_message==0&&temp_Info!=0&&lumi_Info!=0&&access_token!=0){
             	open_message = 1;
-                weibo_status="智能植物护理启动，现在的温度是"+temp_Info+"摄氏度，光照强度是"+lumi_Info+"流明，土壤水分为百分之"+humi_Info+"，系统一切正常。@ioioioion @shen_wu";
+                weibo_status="智能植物护理启动，现在的温度是"+temp_Info+"摄氏度，光照强度是"+lumi_Info+"流明，土壤水分为百分之"+humi_Info+"。@ioioioion @shen_wu";
                 application.invoke(new Message("/weibo"));
             }
             
@@ -288,6 +293,12 @@
             label.skin = button_temp_Skin;
             this.onTap(label);
         </method>
+        <method id="temp_abnormal" params="label">
+            label.style = RednumStyle;
+        </method>
+        <method id="temp_normal" params="label">
+            label.style = numStyle;
+        </method>
         <method id="onTap" params="label">
              trace(label.string);
         </method>
@@ -309,6 +320,7 @@
             label.skin = button_humi_Skin;
             this.onTap(label);
         </method>
+        
         <method id="onTap" params="label">
              trace(label.string);
         </method>
