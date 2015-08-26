@@ -142,23 +142,24 @@
                 temp_Info = result.toFixed(2); 
                 if(eval(temp_Info)<eval(temp_min)&&temp_status!=1){
                     temp_status=1;
-                    application.distribute( "temp_abnormal" ); 
+
                     weibo_status="温度过低警报，现在的温度是"+temp_Info+"摄氏度，低于设置的最低温度"+temp_min+"摄氏度。 @ioioioion @shen_wu";
                     if(open_message==1){                
                     	application.invoke(new Message("/weibo"));
+                        application.invoke( new Message("/temp_abnormal") ); 
                    	}
                 }
                 else if(eval(temp_Info)>eval(temp_max)&&temp_status!=2){
                     temp_status=2;
-                    application.distribute( "temp_abnormal" ); 
+
                     weibo_status="温度过高警报，现在的温度是"+temp_Info+"摄氏度，高于设置的最高温度"+temp_max+"摄氏度。 @ioioioion @shen_wu";
                     if(open_message==1){                
                     	application.invoke(new Message("/weibo"));
+                        application.invoke( new Message("/temp_abnormal") ); 
                    	}
                 }
                 else if(temp_status!=0&&eval(temp_Info)<(eval(temp_max)-1)&&eval(temp_Info)>(eval(temp_min)+1)){
                     temp_status=0;
-                    application.distribute( "temp_normal" );
                 }   
         		application.distribute( "tempChanged", result ); 
         		application.distribute( "upload" ); 
@@ -292,12 +293,6 @@
         <method id="onTouchEnded" params="label">
             label.skin = button_temp_Skin;
             this.onTap(label);
-        </method>
-        <method id="temp_abnormal" params="label">
-            label.style = RednumStyle;
-        </method>
-        <method id="temp_normal" params="label">
-            label.style = numStyle;
         </method>
         <method id="onTap" params="label">
              trace(label.string);
@@ -954,6 +949,23 @@
             </method>
         </behavior>
     </handler>    
+    <handler path="/temp_abnormal">
+        <behavior like="MODEL.DialogBehavior">
+             <method id="onDescribe" params="query">
+                return {
+                    Dialog: DIALOG.Box,
+                    title: "Temperature Alert",
+                    items: [
+                        {
+                            Item: DIALOG.Caption,
+                            string: "Temperature out of range!",
+                        },
+                    ],
+                    ok: "OK",
+                };
+            </method>
+        </behavior>
+    </handler>   
     <handler path="/water_set">
         <behavior like="MODEL.CommandBehavior">
             <method id="onQuery" params="handler, query">
